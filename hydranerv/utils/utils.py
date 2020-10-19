@@ -31,3 +31,14 @@ def run_neuron(T, dt, i_ext_train, neuron):
     ax2.set_ylabel('I$_{ext}$')
     ax2.set_ylim(0, 100)
     plt.show()
+
+
+def euclid_dist(pt1, pt2):
+    """Calculates the Euclidean distance between pt1 and pt2"""
+    return np.sqrt((pt1[0] - pt2[0])**2 + (pt1[1] - pt2[1])**2)
+
+
+def std_euclid_dist(pt1, pt2, std=(1, 1)):
+    """Calculates the standardized Euclidean distance between pt1 and pt2"""
+    return np.sqrt(((pt1[0] - pt2[0]) / std[0])**2 + ((pt1[1] - pt2[1]) / std[1])**2)
+

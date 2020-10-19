@@ -20,18 +20,18 @@ class LIFNeuron:
 
     def _theta_to_i_ext(self, theta):
         """Encode theta to i_ext"""
-        return theta
+        return 0
 
     def _light_to_i_ext(self, light):
         """Encode light to i_ext"""
         return 0
 
-    def rhs(self, theta, light, i_syn):
+    def rhs(self, theta, light, i_syn, i_stim):
         """dv/dt"""
-        i_ext = self._theta_to_i_ext(theta) + self._light_to_i_ext(light)
+        i_ext = self._theta_to_i_ext(theta) + self._light_to_i_ext(light) + i_stim
         return 1 / self.tau * (-self.v + self.r * (i_ext + i_syn))
 
-    def step(self, t, theta, light, i_syn):
+    def step(self, t, theta, light, i_syn, i_stim):
         """Step function"""
 
         # If the neuron just fired, reset v and set last spike time
@@ -39,7 +39,7 @@ class LIFNeuron:
             self.v = self.v_r
             self.spike_train.append(False)
         else:
-            v = self.v + self.rhs(theta, light, i_syn) * self.dt
+            v = self.v + self.rhs(theta, light, i_syn, i_stim) * self.dt
             if v >= self.v_th:
                 # If v reaches the threshold, it fires
                 self.v = self.v_spike
