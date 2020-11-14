@@ -2,12 +2,13 @@ from hydranerv.model.lifneuron import LIFNeuron
 
 
 class RPPacemaker(LIFNeuron):
-    def __init__(self):
+    def __init__(self, theta_amp):
         super().__init__()
+        self.theta_amp = theta_amp
 
     def _theta_to_i_ext(self, theta):
         """Overload"""
-        return theta
+        return self.theta_amp * theta
 
     def _light_to_i_ext(self, light):
         """Overload"""

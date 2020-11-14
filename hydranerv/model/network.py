@@ -34,7 +34,7 @@ class Network:
                 elif y < self.numy // 10 and self.type == "RP":
                     if np.random.uniform() < self.neuron_density:
                         if np.random.uniform() < self.pacemaker_density:
-                            self.neurons[(x, y)] = RPPacemaker()
+                            self.neurons[(x, y)] = RPPacemaker(self.theta_amp)
                         else:
                             self.neurons[(x, y)] = LIFNeuron()
                 elif y > self.numy // 10 * 9 and self.type == "CB":
@@ -46,13 +46,13 @@ class Network:
                 elif np.random.uniform() < self.neuron_density:
                     self.neurons[(x, y)] = LIFNeuron()
 
-    def generate_links(self, algorithm="MST", dist=utils.std_euclid_dist, std=(1, 4)):
+    def generate_links(self, structure="MST", dist=utils.std_euclid_dist, std=(1, 4)):
         """Generate links between neurons based on specified algorithm"""
-        if algorithm == "MST":
+        if structure == "MST":
             self._mst(dist, std)
 
     def _mst(self, dist, std):
-        """Construct minimum spanning tree"""
+        """Construct the minimum spanning tree based on Kruskal algorithm"""
         # Construct fully connected graph
         edges = set()
         neurons = list(self.neurons.keys())
@@ -78,13 +78,13 @@ class Network:
             n1 = edge[1]
             n2 = edge[2]
 
-            # Find root of n1
+            # Find the root of n1
             root1, d1 = n1, 0
             while subtree[root1] != root1:
                 d1 += 1
                 root1 = subtree[root1]
 
-            # Find root of n2
+            # Find the root of n2
             root2, d2 = n2, 0
             while subtree[root2] != root2:
                 d2 += 1

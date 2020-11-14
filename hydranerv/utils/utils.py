@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import random
 
 
 def euler_odeint(rhs, y, T, dt, **kwargs):
@@ -19,7 +20,7 @@ def run_neuron(T, dt, i_ext_train, neuron):
     time = np.arange(0, T + dt, dt)
     for j, t in enumerate(time):
         i_ext = i_ext_train[j]
-        neuron.step(t, i_ext, 0, 0)
+        neuron.step(t, 0, 0, 0, i_ext)
 
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
@@ -31,6 +32,13 @@ def run_neuron(T, dt, i_ext_train, neuron):
     ax2.set_ylabel('I$_{ext}$')
     ax2.set_ylim(0, 100)
     plt.show()
+    
+def randomcolor():
+    colorArr = ['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F']
+    color = ""
+    for i in range(6):
+        color += colorArr[random.randint(0,14)]
+    return "#"+color
 
 
 def euclid_dist(pt1, pt2):
