@@ -46,9 +46,9 @@ def make_vtrain_video(cbfile, rpfile, thetafile, output, numx, numy):
             ax.patch.set_alpha(float((theta[t] - 3) / 4))
             ax.set_xlim(-0.5, numx - 0.5)
             ax.set_ylim(-0.5, numy - 0.5)
-            ax.set_xticklabels(np.arange(numx), rotation=45, fontsize=8)
-            ax.set_yticklabels(np.arange(numy), rotation=0, fontsize=8)
-            plt.grid()
+            # ax.set_xticklabels(np.arange(numx), rotation=45, fontsize=8)
+            # ax.set_yticklabels(np.arange(numy), rotation=0, fontsize=8)
+            # ax.grid()
             for x, y in cbvtrains:
                 ax.plot(x, y, color='green', marker='o', alpha=cbvtrains[(x, y)][t])
             for x, y in rpvtrains:
