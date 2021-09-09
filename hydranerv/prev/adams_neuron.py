@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class AdamsNeuron:
+    """Reproduce paper Adams1985 (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1193447/)"""
     def __init__(self):
         self.dt = 0.001 # s
         self.c_m = 0.05 # uF
