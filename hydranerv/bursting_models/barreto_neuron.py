@@ -1,25 +1,26 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from hydranerv.utils import utils
 
 class BarretoNeuron:
     """Reproduce paper Barreto & Cressman 2011 (https://pubmed.ncbi.nlm.nih.gov/22654181/)"""
-    def __init__(self):
+    def __init__(self, dt=0.001):
         """constructor"""
-        self.dt = 0.001 # s
-        self.c_M = 1 # uF/cm^2
+        self.dt = dt # s
+        self.c_m = 1 # uF/cm^2
         self.g_na = 100 # mS/cm^2
         self.g_nal = 0.0175 # mS/cm^2
         self.g_k = 40 # mS/cm^2
         self.g_kl = 0.05 # mS/cm^2
         self.g_cll = 0.05 # mS/cm^2
-        self.e_cl = -81.9386 # mV
+        self.e_cl = 26.64 * np.log(6 / 130) # mV
         self.beta = 7 # (ratio of the intra and extra volume)
         self.rho = 1.25 # mM/s
-        self.G = 66.666 # mM/s
-        self.epsl = 1.333 # Hz
-        self.k_bath = 4 # mM
-        self.gamma = 4.45 * 10 ** -2 # (unit conversion factor: current -> mM/s)
-        self.tau = 10 ** 3 # (balances the time units)
+        self.glia = 200 / 3 # mM/s
+        self.epsilon = 4 / 3 # Hz
+        self.k_bath = 8 # mM
+        self.gamma = 0.044494542 # (unit conversion factor: current -> mM/s)
+        self.tau = 1000 # (balances the time units)
         self.phi = 3.0
 
     # Sodium
@@ -84,11 +85,11 @@ class BarretoNeuron:
 
     def i_glia(self, k_o):
         """glia current"""
-        return self.G / (1 + np.exp((18 - k_o) / 2.5))
+        return self.glia / (1 + np.exp((18 - k_o) / 2.5))
 
     def i_diffusion(self, k_o):
         """diffusion molar current"""
-        return self.epsl * (k_o - self.k_bath)
+        return self.epsilon * (k_o - self.k_bath)
 
     def calc_currents(self, v, h, n, k_o, na_i):
         return (self.i_na(v, self.e_na(na_i, self.na_o(na_i)), self.m_inf(v), h),
@@ -97,6 +98,14 @@ class BarretoNeuron:
                 self.i_pump(na_i, k_o),
                 self.i_glia(k_o),
                 self.i_diffusion(k_o))
+
+    def reset(self):
+        """reset the initiation values of variables"""
+        self.v0 = -69.37362807007007436
+        self.h0 = 0.9791958267098079
+        self.n0 = 0.06841365960747725
+        self.k_o0 = 3.921555549814548
+        self.na_i0 = 18.50771473212327
 
     def rhs(self, y, t):
         """right-hand side"""
@@ -111,15 +120,28 @@ class BarretoNeuron:
 
         return np.array([dvdt, dhdt, dndt, dkodt, dnaidt])
 
-    def run(self):
+    def run(self, T):
         """run the model"""
-        pass
+        self.reset()
+        y0 = [self.v0, self.h0, self.n0, self.k_o0, self.na_i0]
+        sol = utils.euler_odeint(self.rhs, y0, T, self.dt)
+        return sol
 
-    def disp(self):
-        """display the simulation results"""
-        pass
+def disp(sol, t_total, dt):
+    """display the simulation results"""
+    fig, (ax1, ax2, ax3) = plt.subplots(3, 1)
+    time_axis = np.arange(0, t_total, dt)
+    ax1.plot(time_axis, sol[:, 0])
+    ax2.plot(time_axis, sol[:, 3])
+    ax3.plot(time_axis, sol[:, 4])
+    plt.show()
 
 if __name__ == '__main__':
-    pass
+    t_total = 100
+    dt = 0.01
+    neuron = BarretoNeuron(dt)
+    sol = neuron.run(t_total)
+    disp(sol, t_total, dt)
+
 
 
