@@ -67,7 +67,7 @@ class AdamsNeuron:
     def disp(self):
         """display simulation results"""
         time_axis = np.arange(0, len(self.v_train) * self.dt, self.dt)
-        fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(15,8))
+        fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(10, 5))
         ax1.plot(time_axis, self.v_train)
         ax1.set_ylabel('Potential (mV)')
         ax2.plot(time_axis, self.i_d_train)

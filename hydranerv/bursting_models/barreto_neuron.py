@@ -1,12 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.integrate import odeint
 from hydranerv.utils import utils
 
 class BarretoNeuron:
     """Reproduce paper Barreto & Cressman 2011 (https://pubmed.ncbi.nlm.nih.gov/22654181/)"""
     def __init__(self, dt=0.001):
         """constructor"""
-        self.dt = dt # s
+        self.dt = dt * 1000 # ms
         self.c_m = 1 # uF/cm^2
         self.g_na = 100 # mS/cm^2
         self.g_nal = 0.0175 # mS/cm^2
@@ -101,7 +102,7 @@ class BarretoNeuron:
 
     def reset(self):
         """reset the initiation values of variables"""
-        self.v0 = -69.37362807007007436
+        self.v0 = -67.37362807007007436
         self.h0 = 0.9791958267098079
         self.n0 = 0.06841365960747725
         self.k_o0 = 3.921555549814548
@@ -120,28 +121,34 @@ class BarretoNeuron:
 
         return np.array([dvdt, dhdt, dndt, dkodt, dnaidt])
 
-    def run(self, T):
+    def run(self, t_total, disp=False):
         """run the model"""
+        t_total_ms = t_total * 1000
         self.reset()
         y0 = [self.v0, self.h0, self.n0, self.k_o0, self.na_i0]
-        sol = utils.euler_odeint(self.rhs, y0, T, self.dt)
-        return sol
+        sol = odeint(self.rhs, y0, np.linspace(0, t_total_ms - self.dt, int(t_total_ms / self.dt)))
+        # sol = utils.euler_odeint(self.rhs, y0, t_total, self.dt)
 
-def disp(sol, t_total, dt):
-    """display the simulation results"""
-    fig, (ax1, ax2, ax3) = plt.subplots(3, 1)
-    time_axis = np.arange(0, t_total, dt)
-    ax1.plot(time_axis, sol[:, 0])
-    ax2.plot(time_axis, sol[:, 3])
-    ax3.plot(time_axis, sol[:, 4])
-    plt.show()
+        if disp:
+            fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(10, 5))
+            time_axis = np.linspace(0, t_total - self.dt, int(t_total_ms / self.dt))
+            ax1.plot(time_axis, sol[:, 0])
+            ax1.set_ylabel('Potential (mV)')
+            ax2.plot(time_axis, sol[:, 3])
+            ax2.set_ylabel('K_o (mM)')
+            ax3.plot(time_axis, sol[:, 4])
+            ax3.set_ylabel('Na_i (mM)')
+            ax3.set_xlabel('Time (s)')
+            plt.show()
+
+        # return sol
+
 
 if __name__ == '__main__':
-    t_total = 100
-    dt = 0.01
+    t_total = 100 # s
+    dt = 0.00001 # s
     neuron = BarretoNeuron(dt)
-    sol = neuron.run(t_total)
-    disp(sol, t_total, dt)
+    sol = neuron.run(t_total, disp=True)
 
 
 
