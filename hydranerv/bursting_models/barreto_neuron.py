@@ -102,7 +102,7 @@ class BarretoNeuron:
 
     def reset(self):
         """reset the initiation values of variables"""
-        self.v0 = -67.37362807007007436
+        self.v0 = - 67.37362807007007436
         self.h0 = 0.9791958267098079
         self.n0 = 0.06841365960747725
         self.k_o0 = 3.921555549814548
@@ -141,7 +141,7 @@ class BarretoNeuron:
             ax3.set_xlabel('Time (s)')
             plt.show()
 
-        # return sol
+        return sol
 
 
 if __name__ == '__main__':
