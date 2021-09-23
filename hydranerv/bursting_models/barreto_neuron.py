@@ -23,6 +23,7 @@ class BarretoNeuron:
         self.gamma = 0.044494542 # (unit conversion factor: current -> mM/s)
         self.tau = 1000 # (balances the time units)
         self.phi = 3.0
+        self.reset()
 
     # Sodium
     def i_na(self, v, e_na, m, h):

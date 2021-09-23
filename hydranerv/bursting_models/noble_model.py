@@ -8,9 +8,10 @@ class NobleModel:
     def __init__(self):
         """constructor"""
         self.dt = 0.001 # s
-        self.c_m = 1 # # uF/cm^2
-        self.g_leak = 60 # mS/cm^2
-        self.e_leak = -91 # mV
+        self.c_m = 12 # # uF/cm^2
+        self.g_leak = 75 # uS/cm^2
+        self.e_leak = -60 # mV
+        self.reset()
 
     # Sodium
     def i_na(self, v, m, h):
@@ -40,7 +41,7 @@ class NobleModel:
         return 0.1 * (- v - 50) / (np.exp((- v - 50) / 10) - 1)
 
     def beta_n(self, v):
-        return 2*np.exp((-v-90)/80)
+        return 2 * np.exp((- v - 90) / 80)
 
     # Leak
     def i_leak(self, v):
@@ -63,7 +64,7 @@ class NobleModel:
 
     def reset(self):
         """reset the initiation values of variables"""
-        self.v0 = - 77.748 # mV
+        self.v0 = - 75 # mV
         self.m0 = 0.0537
         self.h0 = 0.772
         self.n0 = 0.0971
@@ -73,7 +74,7 @@ class NobleModel:
         v, m, h, n = y
 
         i_na, i_k, i_leak = self.calc_currents(v, m, h, n)
-        dvdt = - 1 / self.c_m * (i_na + i_k + i_leak - self.i_stim(t, 1, 9))
+        dvdt = - 1 / self.c_m * (i_na + i_k + i_leak) # - self.i_stim(t, 1, 9))
         dmdt = self.alpha_m(v) * (1 - m) - self.beta_m(v) * m
         dhdt = self.alpha_h(v) * (1 - h) - self.beta_h(v) * h
         dndt = self.alpha_n(v) * (1 - n) - self.beta_n(v) * n
