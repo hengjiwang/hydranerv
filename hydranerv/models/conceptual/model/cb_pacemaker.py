@@ -1,5 +1,5 @@
 import numpy as np
-from hydranerv.model.lifneuron import LIFNeuron
+from hydranerv.models.conceptual.model.lifneuron import LIFNeuron
 
 
 class CBPacemaker(LIFNeuron):

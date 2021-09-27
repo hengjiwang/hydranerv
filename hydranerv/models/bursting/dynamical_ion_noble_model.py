@@ -2,9 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 from hydranerv.utils import utils
-from hydranerv.bursting_models.noble_model import NobleModel
+from hydranerv.models.basic.noble_model import NobleModel
 
-class ModifiedNobleModel(NobleModel):
+class DynamicalIonNobleModel(NobleModel):
     """Add ion concentration dependency to reversal potentials"""
     def __init__(self):
         super().__init__()
@@ -113,5 +113,5 @@ class ModifiedNobleModel(NobleModel):
         return sol
 
 if __name__ == '__main__':
-    neuron = ModifiedNobleModel()
+    neuron = DynamicalIonNobleModel()
     sol = neuron.run(t_total=10, disp=True)

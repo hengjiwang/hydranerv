@@ -1,9 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from collections import defaultdict
-from hydranerv.model.lifneuron import LIFNeuron
-from hydranerv.model.cb_pacemaker import CBPacemaker
-from hydranerv.model.rp_pacemaker import RPPacemaker
+from hydranerv.models.conceptual.model.lifneuron import LIFNeuron
+from hydranerv.models.conceptual.model.cb_pacemaker import CBPacemaker
+from hydranerv.models.conceptual.model.rp_pacemaker import RPPacemaker
 import hydranerv.utils.utils as utils
 
 
@@ -148,7 +148,7 @@ class Network:
 
 
 if __name__ == "__main__":
-    network = Network("CB", 30, 60, 0.1, 3, 0.2)
+    network = Network("CB", 30, 60, 0.1, 1, 2, 0.2, 20000, 250)
     network.display()
 
 
