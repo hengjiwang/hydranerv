@@ -1,4 +1,4 @@
-from hydranerv.models.basic.lif_neuron import LIFNeuron
+from hydranerv.models.conceptual.model.lif_neuron import LIFNeuron
 
 
 class RPPacemaker(LIFNeuron):
