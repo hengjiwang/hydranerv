@@ -67,24 +67,30 @@ class MechSenseNeuron(LIFNeuron):
         # Update time
         self.t += self.dt
 
-    def disp(self):
+    def disp(self, full=True):
         """display simulation results"""
         time_axis = np.arange(0, len(self.v_train) * self.dt, self.dt)
-        # fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, figsize=(15, 8))
-        fig, ax1 = plt.subplots(1, 1, figsize=(20, 2))
-        ax1.plot(time_axis, self.v_train)
-        ax1.set_ylabel('Potential (mV)')
-        # ax2.plot(time_axis, self.acc_train)
-        # ax2.set_ylabel('Spikes effects')
-        # ax3.plot(time_axis, self.p_train)
-        # ax3.set_ylabel('Pressure (Pa)')
-        # ax4.plot(time_axis, self.i_ext_train)
-        # ax4.set_ylabel('Current (nA)')
-        # ax4.set_xlabel('Time (s)')
-        ax1.set_title(str(round(self.r_d, 2)) + ', ' +
-                      str(round(self.r_h, 2)) + ', ' +
-                      str(self.tau_d) + ', ' +
-                      str(self.tau_h))
+
+        if full:
+            fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, figsize=(12, 8))
+            ax1.plot(time_axis, self.v_train)
+            ax1.set_ylabel('Potential (mV)')
+            ax2.plot(time_axis, self.acc_train)
+            ax2.set_ylabel('Spikes effects')
+            ax3.plot(time_axis, self.p_train)
+            ax3.set_ylabel('Pressure (Pa)')
+            ax4.plot(time_axis, self.i_ext_train)
+            ax4.set_ylabel('Current (nA)')
+            ax4.set_xlabel('Time (s)')
+        else:
+            fig, ax1 = plt.subplots(1, 1, figsize=(20, 2))
+            ax1.plot(time_axis, self.v_train)
+            ax1.set_ylabel('Potential (mV)')
+            ax1.set_xlabel('Time (s)')
+            ax1.set_title(str(round(self.r_d, 2)) + ', ' +
+                        str(round(self.r_h, 2)) + ', ' +
+                        str(self.tau_d) + ', ' +
+                        str(self.tau_h))
         plt.show()
 
 if __name__ == '__main__':
