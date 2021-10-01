@@ -21,18 +21,18 @@ class LIFNeuron:
         self.t = 0 # s
         self.t_last = - np.inf # s
         self.v_train = [self.v_rest] # mV
-        self.i_ext_train = [0] # nA
+        self.i_mem_train = [0] # nA
         self.spike_train = [] # s
 
     def i_leak(self, v):
         """leak current"""
         return (v - self.v_rest) / self.r_m
 
-    def i_ext(self):
-        """external current"""
+    def i_mem(self):
+        """membrane current"""
         return .6
 
-    def update_v(self, v, i_ext):
+    def update_v(self, v, i_mem):
         """update potential"""
         if self.t - self.t_last < self.t_pulse:
             v = self.v_max
@@ -43,23 +43,23 @@ class LIFNeuron:
             self.t_last = self.t
             self.spike_train.append(self.t)
         else:
-            v += self.dt / self.c_m * (i_ext - self.i_leak(v))
+            v += self.dt / self.c_m * (i_mem - self.i_leak(v))
         return v
 
     def step(self):
         """step function"""
 
         v = self.v_train[-1]
-        i_ext = self.i_ext_train[-1]
+        i_mem = self.i_mem_train[-1]
 
         # Update potential
-        v = self.update_v(v, i_ext)
+        v = self.update_v(v, i_mem)
 
-        # Update i_ext
-        i_ext = self.i_ext()
+        # Update i_mem
+        i_mem = self.i_mem()
 
         self.v_train.append(v)
-        self.i_ext_train.append(i_ext)
+        self.i_mem_train.append(i_mem)
         self.t += self.dt
 
     def run(self, t_total):
@@ -75,8 +75,8 @@ class LIFNeuron:
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 5))
         ax1.plot(time_axis, self.v_train)
         ax1.set_ylabel('Potential (mV)')
-        ax2.plot(time_axis, self.i_ext_train)
-        ax2.set_ylabel('I_ext (nA)')
+        ax2.plot(time_axis, self.i_mem_train)
+        ax2.set_ylabel('I_mem (nA)')
         ax2.set_xlabel('Time (s)')
         plt.show()
 

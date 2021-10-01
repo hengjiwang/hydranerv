@@ -22,12 +22,10 @@ class MechSenseNeuron(LIFNeuron):
         self.acc_train = [0]
         self.p_train = [0.9] # Pa
 
-    def i_ext(self, p):
-        """mechanosensitive channel current"""
-        if p > self.p_th:
-            return self.k_p * (p - self.p_th)
-        else:
-            return 0
+    def i_mem(self, p, i_input):
+        """membrane channel current"""
+        i_m = self.k_p * (p - self.p_th) if p > self.p_th else 0
+        return i_m + i_input
 
     def update_acc(self):
         """update spikes effect"""
@@ -42,15 +40,15 @@ class MechSenseNeuron(LIFNeuron):
         p = p + self.dt * (self.r_p_inc + acc)
         return p
 
-    def step(self):
+    def step(self, i_input=0):
         """step function"""
 
         v = self.v_train[-1]
         p = self.p_train[-1]
-        i_m = self.i_ext_train[-1]
+        i_mem = self.i_mem_train[-1]
 
         # Update potential
-        v = self.update_v(v, i_m)
+        v = self.update_v(v, i_mem)
         self.v_train.append(v)
 
         # Update spikes effect
@@ -61,8 +59,8 @@ class MechSenseNeuron(LIFNeuron):
         p = self.update_p(p, acc)
         self.p_train.append(p)
 
-        # Update mechanosensitive current
-        self.i_ext_train.append(self.i_ext(p))
+        # Update membrane current
+        self.i_mem_train.append(self.i_mem(p, i_input))
 
         # Update time
         self.t += self.dt
@@ -79,7 +77,7 @@ class MechSenseNeuron(LIFNeuron):
             ax2.set_ylabel('Spikes effects')
             ax3.plot(time_axis, self.p_train)
             ax3.set_ylabel('Pressure (Pa)')
-            ax4.plot(time_axis, self.i_ext_train)
+            ax4.plot(time_axis, self.i_mem_train)
             ax4.set_ylabel('Current (nA)')
             ax4.set_xlabel('Time (s)')
         else:
