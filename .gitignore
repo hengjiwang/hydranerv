@@ -130,3 +130,4 @@ results/
 data/
 .idea
 param_sweep*
+archive/
