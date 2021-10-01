@@ -129,3 +129,4 @@ save/
 results/
 data/
 .idea
+param_sweep*

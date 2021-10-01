@@ -8,8 +8,9 @@ class MechSenseNeuron(LIFNeuron):
         super().__init__()
         self.p_th = 1 # Pa
         self.k_p = 5 # nA/Pa
-        self.r_p_inc = 0.01 # Pa/s
-        self.r_p_dec = 0.002 # Pa/s
+        self.r_p_inc = 0.1 # Pa/s
+        self.r_p_dec = 0.01 # Pa/s
+        self.p_out = 5
         self.tau_p = 60 # s
         self.reset()
 
@@ -26,6 +27,18 @@ class MechSenseNeuron(LIFNeuron):
         else:
             return 0
 
+    def update_acc(self):
+        """update spikes effect"""
+        acc = 0
+        for t_spike in self.spike_train:
+            acc += np.exp( - (self.t - t_spike) / self.tau_p)
+        return acc
+
+    def update_p(self, p, acc):
+        """update pressure"""
+        p = p + self.dt * (self.r_p_inc - self.r_p_dec * acc)
+        return p
+
     def step(self):
         """step function"""
 
@@ -38,13 +51,11 @@ class MechSenseNeuron(LIFNeuron):
         self.v_train.append(v)
 
         # Update spikes effect
-        acc = 0
-        for t_spike in self.spike_train:
-            acc += np.exp( - (self.t - t_spike) / self.tau_p)
+        acc = self.update_acc()
         self.acc_train.append(acc)
 
         # Update pressure
-        p += self.dt * (self.r_p_inc - self.r_p_dec * acc)
+        p = self.update_p(p, acc)
         self.p_train.append(p)
 
         # Update mechanosensitive current
@@ -56,7 +67,8 @@ class MechSenseNeuron(LIFNeuron):
     def disp(self):
         """display simulation results"""
         time_axis = np.arange(0, len(self.v_train) * self.dt, self.dt)
-        fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, figsize=(10, 6))
+        fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, figsize=(15, 8))
+        # fig, ax1 = plt.subplots(1, 1, figsize=(20, 2))
         ax1.plot(time_axis, self.v_train)
         ax1.set_ylabel('Potential (mV)')
         ax2.plot(time_axis, self.acc_train)
@@ -66,6 +78,10 @@ class MechSenseNeuron(LIFNeuron):
         ax4.plot(time_axis, self.i_ext_train)
         ax4.set_ylabel('Current (nA)')
         ax4.set_xlabel('Time (s)')
+        ax1.set_title(str(round(self.r_p_inc, 2)) + ', ' +
+                      str(round(self.r_p_dec, 3)) + ', ' +
+                      str(self.tau_p) + ', ' +
+                      str(self.k_p))
         plt.show()
 
 if __name__ == '__main__':

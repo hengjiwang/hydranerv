@@ -14,12 +14,12 @@ class LIFNeuron:
         self.v_th = - 30 # mV
         self.v_rest = - 40 # mV
         self.t_pulse = 0.05 # s
-        self.t_last = - np.inf # s
         self.reset()
 
     def reset(self):
         """reset neuron states"""
         self.t = 0 # s
+        self.t_last = - np.inf # s
         self.v_train = [self.v_rest] # mV
         self.i_ext_train = [0] # nA
         self.spike_train = [] # s
