@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 
 class LIFNeuron:
     """leaky integrated-and-fire neuron"""
-    def __init__(self):
+    def __init__(self, dt=0.01):
         """configurator"""
-        self.dt = 0.001 # s
+        self.dt = dt # s
         self.c_m = 0.05 # uF
         self.r_m = 20 # MOhm
         self.v_max = 40 # mV
@@ -71,11 +71,11 @@ class LIFNeuron:
 
     def disp(self):
         """display simulation results"""
-        time_axis = np.arange(0, len(self.v_train) * self.dt, self.dt)
+        time_axis = np.arange(self.dt, len(self.v_train) * self.dt, self.dt)
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 5))
-        ax1.plot(time_axis, self.v_train)
+        ax1.plot(time_axis, self.v_train[1:])
         ax1.set_ylabel('Potential (mV)')
-        ax2.plot(time_axis, self.i_mem_train)
+        ax2.plot(time_axis, self.i_mem_train[1:])
         ax2.set_ylabel('I_mem (nA)')
         ax2.set_xlabel('Time (s)')
         plt.show()
