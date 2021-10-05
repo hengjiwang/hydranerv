@@ -32,7 +32,7 @@ def run_neuron(T, dt, i_ext_train, neuron):
     ax2.set_ylabel('I$_{ext}$')
     ax2.set_ylim(0, 100)
     plt.show()
-    
+
 def randomcolor():
     colorArr = ['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F']
     color = ""
@@ -49,4 +49,10 @@ def euclid_dist(pt1, pt2):
 def std_euclid_dist(pt1, pt2, std=(1, 1)):
     """Calculates the standardized Euclidean distance between pt1 and pt2"""
     return np.sqrt(((pt1[0] - pt2[0]) / std[0])**2 + ((pt1[1] - pt2[1]) / std[1])**2)
+
+def min_max_norm(l, rescale=1, offset=0):
+    minv, maxv = min(l), max(l)
+    if minv == maxv:
+        return [0 for _ in l]
+    return [rescale * (x - minv) / (maxv - minv) + offset for x in l]
 

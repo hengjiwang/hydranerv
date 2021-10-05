@@ -24,6 +24,10 @@ class LIFNeuron:
         self.i_mem_train = [0] # nA
         self.spike_train = [] # s
 
+    def v(self):
+        """get potential"""
+        return self.v_train[-1]
+
     def i_leak(self, v):
         """leak current"""
         return (v - self.v_rest) / self.r_m
