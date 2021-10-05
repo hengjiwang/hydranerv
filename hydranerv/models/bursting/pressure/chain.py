@@ -19,31 +19,35 @@ class Chain:
         self.neurons = [MechSenseNeuron(self.dt) for _ in range(self.num)]
         self.pcontroller = PressureController(self.neurons[0])
 
-    def i_couple(self, vneuron, vneighbors):
+    def i_couple(self, i, voltages):
         """coupling current of potential"""
         ic = 0
+        v = voltages[i]
+        vneighbors = self.v_neighbors(i, voltages)
         for vneighbor in vneighbors:
-            ic += self.gc * (vneighbor - vneuron)
+            ic += self.gc * (vneighbor - v)
         return ic
+
+    def v_neighbors(self, i, voltages):
+        """return the potential of neuron i's neighbors"""
+        vneighbors = []
+        if i > 0:
+            vneighbors.append(voltages[i - 1])
+        if i < self.num - 1:
+            vneighbors.append(voltages[i + 1])
+        return vneighbors
 
     def step(self):
         """step function"""
         voltages = [x.v() for x in self.neurons]
         for i in range(self.num):
             neuron = self.neurons[i]
-            vneuron = voltages[i]
-            vneighbors = []
-            if i > 0:
-                vneighbors.append(voltages[i - 1])
-            if i < self.num - 1:
-                vneighbors.append(voltages[i + 1])
-
             if i == 0:
                 neuron.step(p=self.pcontroller.pressure(),
-                            i_input=self.i_couple(vneuron, vneighbors))
+                            i_input=self.i_couple(i, voltages))
             else:
                 neuron.step(p=0,
-                            i_input=self.i_couple(vneuron, vneighbors))
+                            i_input=self.i_couple(i, voltages))
         self.pcontroller.update()
 
     def run(self, t_total):
