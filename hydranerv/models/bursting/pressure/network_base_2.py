@@ -85,3 +85,14 @@ class NetworkBase2:
         time_axis = np.arange(self.dt, t_total, self.dt)
         for t in time_axis:
             self.step()
+
+    def disp_conn_mat(self):
+        """display the connectivity matrix"""
+        conn_mat = np.zeros((self.num, self.num))
+        for i in range(self.num):
+            for j in self.neighbors[i]:
+                conn_mat[i, j] = 1
+
+        plt.figure()
+        plt.imshow(conn_mat, cmap='binary')
+        plt.show()

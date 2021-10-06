@@ -83,3 +83,14 @@ class NetworkBase:
         ax1.plot(time_axis, utils.min_max_norm(self.pcontroller.p_train[1:], .9, self.num), 'k--')
         ax1.set_ylim(0, self.num + 1)
         plt.show()
+
+    def disp_conn_mat(self):
+        """display the connectivity matrix"""
+        conn_mat = np.zeros((self.num, self.num))
+        for i in range(self.num):
+            for j in self.neighbors[i]:
+                conn_mat[i, j] = 1
+
+        plt.figure()
+        plt.imshow(conn_mat, cmap='binary')
+        plt.show()

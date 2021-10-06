@@ -1,7 +1,7 @@
 import numpy as np
-from hydranerv.models.bursting.pressure.network_base import NetworkBase
+from hydranerv.models.bursting.pressure.network_base_2 import NetworkBase2
 
-class RandomNetwork(NetworkBase):
+class RandomNetwork2(NetworkBase2):
 
     def __init__(self, num=10, gc=100, dt=0.01):
         """constructor"""
@@ -16,6 +16,6 @@ class RandomNetwork(NetworkBase):
                     self.neighbors[j].append(i)
 
 if __name__ == '__main__':
-    randnet = RandomNetwork(gc=.075)
+    randnet = RandomNetwork2(gc=.075)
     randnet.run(100)
     randnet.disp(spike=False)
