@@ -9,11 +9,11 @@ class LIFNeuron:
         self.dt = dt # s
         self.c_m = 0.05 # uF
         self.r_m = 20 # MOhm
-        self.v_max = 40 # mV
-        self.v_min = - 50 # mV
-        self.v_th = - 30 # mV
-        self.v_rest = - 40 # mV
-        self.t_pulse = 0.05 # s
+        self.v_max = 20 # mV
+        self.v_th = - 50 # mV
+        self.v_rest = - 60 # mV
+        self.t_pulse = .05 # s
+        self.t_refrc = .5 # s
         self.reset()
 
     def reset(self):
@@ -40,8 +40,8 @@ class LIFNeuron:
         """update potential"""
         if self.t - self.t_last < self.t_pulse:
             v = self.v_max
-        elif v == self.v_max:
-            v = self.v_min
+        elif self.t - self.t_last < self.t_pulse + self.t_refrc:
+            v = self.v_rest
         elif v >= self.v_th:
             v = self.v_max
             self.t_last = self.t

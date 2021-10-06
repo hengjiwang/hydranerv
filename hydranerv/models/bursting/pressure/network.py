@@ -12,10 +12,6 @@ class Network(Chain):
         """constructor"""
         super().__init__(num, gc, dt)
         self.neighbors = [[] for _ in range(self.num)]
-
-    def reset(self):
-        """reset the states"""
-        super().reset()
         self.make_connections()
 
     def make_connections(self, density=.1):
@@ -27,3 +23,8 @@ class Network(Chain):
         for neighbor in self.neighbors[i]:
             vneighbors.append(voltages[neighbor])
         return vneighbors
+
+if __name__ == '__main__':
+    network = Network(gc=.2)
+    network.run(100)
+    network.disp(spike=False)

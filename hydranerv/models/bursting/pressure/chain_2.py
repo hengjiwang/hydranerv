@@ -81,7 +81,7 @@ class Chain2:
         plt.show()
 
 if __name__ == '__main__':
-    chain = Chain2(gc=0.2)
+    chain = Chain2(gc=.2)
     chain.run(100)
     chain.disp(spike=False)
 
