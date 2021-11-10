@@ -7,50 +7,49 @@ class PressureController:
     def __init__(self, neuron):
         self.neuron = neuron
         self.dt = self.neuron.dt
-        self.r_p_inc = .1 # Pa/s
-        self.r_d = .1 # Pa/s
-        self.r_h = .05 # Pa/s
-        self.tau_d = 2 # s
-        self.tau_h = 10 # s
+        self.k_in = .1
+        self.k_e = .2
+        self.alpha = 1
+        self.beta = 1
+        self.tau_c = 2
         self.reset()
 
     def reset(self):
         self.p_train = [0.9]
-        self.acc_train = [0]
+        self.vsize_train = [0]
 
     def t(self):
         return self.neuron.t
 
-    def acc(self):
-        return self.acc_train[-1]
+    def vsize(self):
+        return self.vsize_train[-1]
 
     def pressure(self):
         return self.p_train[-1]
 
-    def update_acc(self):
+    def update_vsize(self):
         """update spikes effect"""
-        acc = 0
+        vsize = self.k_in * self.t()
         for t_spike in self.neuron.spike_train:
-            acc += self.r_d * np.exp( - (self.t() - t_spike) / self.tau_d)
-            acc += - self.r_h * np.exp( - (self.t() - t_spike) / self.tau_h)
-        self.acc_train.append(acc)
+            vsize -= self.k_e
+        self.vsize_train.append(vsize)
 
     def update_p(self):
         """update pressure"""
-        p = self.pressure()
-        acc = self.acc()
-        p = p + self.dt * (self.r_p_inc + acc)
+        p = self.alpha * self.vsize()
+        for t_spike in self.neuron.spike_train:
+            p += self.beta * np.exp(- (self.t() - t_spike) / self.tau_c)
         self.p_train.append(p)
 
     def update(self):
-        self.update_acc()
+        self.update_vsize()
         self.update_p()
 
     def disp(self):
         time_axis = np.arange(self.dt, len(self.p_train) * self.dt, self.dt)
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 5))
-        ax1.plot(time_axis, self.acc_train[1:])
-        ax1.set_ylabel('Spikes effects')
+        ax1.plot(time_axis, self.vsize_train[1:])
+        ax1.set_ylabel('Vacuole size')
         ax2.plot(time_axis, self.p_train[1:])
         ax2.set_ylabel('Pressure (Pa)')
         ax2.set_xlabel('Time (s)')
