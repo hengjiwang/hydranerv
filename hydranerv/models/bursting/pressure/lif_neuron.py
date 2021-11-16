@@ -73,15 +73,20 @@ class LIFNeuron:
         for t in time_axis:
             self.step()
 
-    def disp(self):
+    def disp(self, i_mem=True):
         """display simulation results"""
         time_axis = np.arange(self.dt, len(self.v_train) * self.dt, self.dt)
-        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 5))
-        ax1.plot(time_axis, self.v_train[1:])
-        ax1.set_ylabel('Potential (mV)')
-        ax2.plot(time_axis, self.i_mem_train[1:])
-        ax2.set_ylabel('I_mem (nA)')
-        ax2.set_xlabel('Time (s)')
+        if i_mem:
+            fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 5))
+            ax1.plot(time_axis, self.v_train[1:])
+            ax1.set_ylabel('Potential (mV)')
+            ax2.plot(time_axis, self.i_mem_train[1:])
+            ax2.set_ylabel('I_mem (nA)')
+            ax2.set_xlabel('Time (s)')
+        else:
+            fig, ax1 = plt.subplots(1, 1, figsize=(15, 2))
+            ax1.plot(time_axis, self.v_train[1:])
+            ax1.set_ylabel('Potential (mV)')
         plt.show()
 
 if __name__ == '__main__':

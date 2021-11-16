@@ -7,11 +7,11 @@ class PressureController:
     def __init__(self, neuron):
         self.neuron = neuron
         self.dt = self.neuron.dt
-        self.k_in = .1
-        self.k_e = .2
+        self.k_in = .05
+        self.k_e = .4
         self.alpha = 1
-        self.beta = 1
-        self.tau_c = 2
+        self.beta = .5
+        self.tau_c = 20
         self.reset()
 
     def reset(self):
