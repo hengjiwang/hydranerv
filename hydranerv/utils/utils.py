@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import random
+from collections import defaultdict
 
 
 def euler_odeint(rhs, y, T, dt, **kwargs):
@@ -55,4 +56,26 @@ def min_max_norm(l, rescale=1, offset=0):
     if minv == maxv:
         return [0 for _ in l]
     return [rescale * (x - minv) / (maxv - minv) + offset for x in l]
+
+def cluster_spikes(spike_train, mul=5):
+    """Separate spikes to clusters and return a dictionary"""
+    res = defaultdict(list)
+    n = len(spike_train)
+    if n == 0:
+        return res
+    if n <= 2:
+        res[0] = spike_train
+        return res
+
+    typical_isi = spike_train[1] - spike_train[0]
+    j = 0
+    res[0].append(spike_train[0])
+    for i in range(1, n):
+        if spike_train[i] - spike_train[i-1] >= typical_isi * mul:
+            j += 1
+        res[j].append(spike_train[i])
+    return res
+
+
+
 

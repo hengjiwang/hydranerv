@@ -6,7 +6,7 @@ class MechSenseNeuron(LIFNeuron):
     """A modified LIF neuron with mechanosensitive ion channel"""
     def __init__(self, dt=0.01):
         super().__init__(dt)
-        self.p_th = 1 # Pa
+        self.p_th = .5 # Pa
         self.k_p = 1 # nA/Pa
         self.reset()
 
