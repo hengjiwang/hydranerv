@@ -1,0 +1,10 @@
+# Hydra CB neuron model
+init v=-75, w=25000, a=0
+par c_m=50, v_th=-55, v_r=-75, g_l=15, e_l=-75, tau_a=5, k_in=50, k_e=600, k_a=5400, g_s=25, e_s=10, s=.00277, k_b=106, m=25
+@ meth=euler, total=1000, dt=.01, maxstor=1000000, bound=100000
+dv/dt = - 1 / c_m * (g_l * (v - e_l) + g_s / (1 + k_b * exp(-s * ((a + w)/m))) * (v - e_s))
+da/dt = - a / tau_a
+dw/dt = k_in
+global 1 v - v_th {v = v_r; a = a + k_a; w = w - k_e}
+done
+
