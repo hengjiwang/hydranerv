@@ -5,12 +5,14 @@ from sympy import divisor_sigma
 
 class Neuron:
     """a lif-based model for hydra cb neuron"""
-    def __init__(self, dt=.01, tmax=1000):
+    def __init__(self, dt=.01, tmax=1000, anoise=0, ispacemaker=True):
         """configurator"""
 
         # Simulation parameters
         self.tmax = tmax
         self.dt = dt
+        self.anoise = anoise
+        self.ispacemaker = ispacemaker
 
         # LIF parameters
         self.dt = dt # s
@@ -20,6 +22,7 @@ class Neuron:
         self.g_l = 15 # nS
         self.e_l = self.v_r
         self.v_spike = 20 # mV
+        # self.t_ref = .05 # s
 
         # Stress parameters
         self.tau_p = 5 # s
@@ -51,7 +54,7 @@ class Neuron:
         self.t_last = - np.inf # s
         self.v_train.append(self.v_r)
         self.sigma_a_train.append(0)
-        self.sigma_w_train.append(25000)
+        self.sigma_w_train.append(25000 + self.anoise)
 
     def v(self):
         """get v"""
@@ -75,17 +78,30 @@ class Neuron:
 
     def i_s(self):
         """mechanosensitive current"""
-        return self.g_s / (1 + self.k_b * np.exp(- self.s * (self.sigma_m() / self.m) ** self.q)) * (self.v() - self.e_s)
+        if self.ispacemaker:
+            return self.g_s / (1 + self.k_b * np.exp(- self.s * (self.sigma_m() / self.m) ** self.q)) * (self.v() - self.e_s)
+        else:
+            return 0
 
-    def step(self):
+    def step(self, i_ex=0):
         """step function"""
         v = self.v()
         sigma_a = self.sigma_a()
         sigma_w = self.sigma_w()
+
+        # if self.t < self.t_last + self.t_ref:
+
+        #     v = self.v_r
+        #     da = - self.sigma_a() / self.tau_p
+        #     dw = self.k_in
+        #     sigma_a += da * self.dt
+        #     sigma_w += dw * self.dt
+
+
         if v < self.v_th:
 
             # Derivatives
-            dv = 1 / self.c_m * (- self.i_l() - self.i_s())
+            dv = 1 / self.c_m * (- self.i_l() - self.i_s() + i_ex)
             da = - self.sigma_a() / self.tau_p
             dw = self.k_in
 
