@@ -1,11 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.cluster import k_means
-from sympy import divisor_sigma
+# from sklearn.cluster import k_means
+# from sympy import divisor_sigma
 
 class Neuron:
     """a lif-based model for hydra cb neuron"""
-    def __init__(self, dt=.01, tmax=1000, anoise=0, ispacemaker=True):
+    def __init__(self, dt=.01, tmax=1000, anoise=0, ispacemaker=True, t_ref=.1):
         """configurator"""
 
         # Simulation parameters
@@ -22,7 +22,8 @@ class Neuron:
         self.g_l = 15 # nS
         self.e_l = self.v_r
         self.v_spike = 20 # mV
-        # self.t_ref = .05 # s
+        self.t_pk = .0 # mV
+        self.t_ref = t_ref # s
 
         # Stress parameters
         self.tau_p = 5 # s
@@ -89,17 +90,23 @@ class Neuron:
         sigma_a = self.sigma_a()
         sigma_w = self.sigma_w()
 
-        # if self.t < self.t_last + self.t_ref:
+        if self.t < self.t_last + self.t_pk:
 
-        #     v = self.v_r
-        #     da = - self.sigma_a() / self.tau_p
-        #     dw = self.k_in
-        #     sigma_a += da * self.dt
-        #     sigma_w += dw * self.dt
+            v = self.v_spike
+            da = - self.sigma_a() / self.tau_p
+            dw = self.k_in
+            sigma_a += da * self.dt
+            sigma_w += dw * self.dt
 
+        elif self.t < self.t_last + self.t_pk + self.t_ref or v == self.v_spike:
 
-        if v < self.v_th:
+            v = self.v_r
+            da = - self.sigma_a() / self.tau_p
+            dw = self.k_in
+            sigma_a += da * self.dt
+            sigma_w += dw * self.dt
 
+        else:
             # Derivatives
             dv = 1 / self.c_m * (- self.i_l() - self.i_s() + i_ex)
             da = - self.sigma_a() / self.tau_p
@@ -110,14 +117,12 @@ class Neuron:
             sigma_a += da * self.dt
             sigma_w += dw * self.dt
 
-        else:
-
-            self.v_train[-1] = self.v_spike
-            v = self.v_r
-            sigma_a += self.k_a
-            sigma_w += - self.k_e
-            self.spikes.append(self.t * self.dt)
-            self.t_last = self.t
+            if v > self.v_th:
+                v = self.v_spike
+                sigma_a += self.k_a
+                sigma_w += - self.k_e
+                self.spikes.append(self.t)
+                self.t_last = self.t
 
         # Update neuron state
         self.v_train.append(v)
@@ -143,6 +148,6 @@ class Neuron:
         plt.show()
 
 if __name__ == '__main__':
-    neuron = Neuron()
-    neuron.run()
-    neuron.disp()
+    nrn = Neuron()
+    nrn.run()
+    nrn.disp()
