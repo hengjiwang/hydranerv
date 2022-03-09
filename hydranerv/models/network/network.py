@@ -1,3 +1,4 @@
+from collections import defaultdict
 import numpy as np
 import matplotlib.pyplot as plt
 from hydranerv.utils import utils
@@ -6,7 +7,7 @@ from hydranerv.models.network.neuron import Neuron
 
 class Network:
     """a model for neuronal networks"""
-    def __init__(self, num=10, edges=[], gc=1, dt=.01, tmax=1000, pacemakers=[0], t_ref=.1, conn_type='gap_junction', t_syn=.01):
+    def __init__(self, num=10, edges=[], gc=1, dt=.01, tmax=1000, pacemakers=[0], t_ref=.1, conn_type='gap_junction', t_syn=.01, wnoise=0, is_semi_pm=False):
         """constructor"""
         self.num = num
         self.edges = edges
@@ -17,6 +18,10 @@ class Network:
         self.t_ref = t_ref
         self.conn_type = conn_type
         self.t_syn = t_syn
+        self.wnoise = wnoise
+        self.is_semi_pm = is_semi_pm
+        self.i_stim = 1200
+        self.t_stim = .1
         self.setup()
         self.reset()
 
@@ -25,11 +30,16 @@ class Network:
         self.neurons = []
         for i in range(self.num):
             if i in self.pacemakers:
-                self.neurons.append(Neuron(self.dt, self.tmax, 0, True, self.t_ref))
+                self.neurons.append(Neuron(self.dt, self.tmax, np.random.uniform(-self.wnoise, self.wnoise), True, self.t_ref))
+            elif self.is_semi_pm:
+                nrn = Neuron(self.dt, self.tmax, np.random.uniform(-self.wnoise, self.wnoise), True, self.t_ref)
+                nrn.k_in = nrn.k_in / 2
+                # nrn.s = .002
+                self.neurons.append(nrn)
             else:
-                self.neurons.append(Neuron(self.dt, self.tmax, 0, False, self.t_ref))
+                self.neurons.append(Neuron(self.dt, self.tmax, np.random.uniform(-self.wnoise, self.wnoise), False, self.t_ref))
+
         # Construct connections
-        self.neighbors = [[] for _ in range(self.num)]
         self.set_connections()
 
     def reset(self):
@@ -41,11 +51,13 @@ class Network:
 
     def set_connections(self, add_edges=[]):
         """set connections for neurons"""
+        self.neighbors = [[] for _ in range(self.num)]
         for edge in add_edges:
             if edge not in self.edges:
                 self.edges.append(edge)
         for edge in self.edges:
-            self.add_edge(edge)
+            self.neighbors[edge[0]].append(edge[1])
+            self.neighbors[edge[1]].append(edge[0])
 
     def add_edge(self, edge):
         if edge not in self.edges:
@@ -62,7 +74,7 @@ class Network:
         for neighbor in neighbors:
 
             if self.conn_type == 'gap_junction':
-                vneighbor = voltages[neighbor] # if voltages[neighbor] < self.neurons[neighbor].v_th else 20
+                vneighbor = voltages[neighbor] if voltages[neighbor] < self.neurons[neighbor].v_th else 20
                 ic += self.gc * (vneighbor - v)
             elif self.conn_type == 'synapse':
                 if self.t < self.neurons[neighbor].t_last + self.t_syn:
@@ -70,19 +82,27 @@ class Network:
 
         return ic
 
-    def step(self):
+    def step(self, nrns=[]):
         """step function"""
         voltages = [x.v() for x in self.neurons]
         for i, neuron in enumerate(self.neurons):
-            neuron.step(self.i_c(i, voltages))
+            if i in nrns:
+                neuron.step(self.i_c(i, voltages) + self.i_stim)
+            else:
+                neuron.step(self.i_c(i, voltages))
         self.t += self.dt
 
-    def run(self):
+    def run(self, stim={}):
         """run simulation"""
         self.reset()
         time_axis = np.arange(self.dt, self.tmax, self.dt)
+        stim_nrns = []
         for t in tqdm(time_axis):
-            self.step()
+            for t_st in stim:
+                if 0 <= t - t_st < self.t_stim:
+                    stim_nrns = stim[t_st]
+                    break
+            self.step(stim_nrns)
 
     def disp(self, figsize=(10, 6), style='spike', ineurons=None, skip=1):
         """display simulation results"""

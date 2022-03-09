@@ -5,13 +5,13 @@ import matplotlib.pyplot as plt
 
 class Neuron:
     """a lif-based model for hydra cb neuron"""
-    def __init__(self, dt=.01, tmax=1000, anoise=0, ispacemaker=True, t_ref=.1):
+    def __init__(self, dt=.01, tmax=1000, wnoise=0, ispacemaker=True, t_ref=.1):
         """configurator"""
 
         # Simulation parameters
         self.tmax = tmax
         self.dt = dt
-        self.anoise = anoise
+        self.wnoise = wnoise
         self.ispacemaker = ispacemaker
 
         # LIF parameters
@@ -55,7 +55,7 @@ class Neuron:
         self.t_last = - np.inf # s
         self.v_train.append(self.v_r)
         self.sigma_a_train.append(0)
-        self.sigma_w_train.append(25000 + self.anoise)
+        self.sigma_w_train.append(25000 + self.wnoise)
 
     def v(self):
         """get v"""

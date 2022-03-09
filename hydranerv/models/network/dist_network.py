@@ -6,11 +6,11 @@ from hydranerv.utils import utils
 
 class DistNetwork(Network):
     """a model for neuronal networks where the connectivity is exponentially decay with distance"""
-    def __init__(self, num=10, gc=1, dt=.01, tmax=1000, pacemakers=[0], t_ref=.1, conn_type='gap_junction', t_syn=.01, lambda_d=.1):
+    def __init__(self, num=10, gc=1, dt=.01, tmax=1000, pacemakers=[0], t_ref=.1, conn_type='gap_junction', t_syn=.01, wnoise=0, is_semi_pm=False, lambda_d=.1):
         """constructor"""
         self.locations = []
         self.lambda_d = lambda_d
-        super().__init__(num, [], gc, dt, tmax, pacemakers, t_ref, conn_type, t_syn)
+        super().__init__(num, [], gc, dt, tmax, pacemakers, t_ref, conn_type, t_syn, wnoise, is_semi_pm)
 
     def set_locations(self):
         """set locations for neurons"""
@@ -22,6 +22,7 @@ class DistNetwork(Network):
     def set_connections(self):
         """set connections for neurons"""
         self.set_locations()
+        self.neighbors = [[] for _ in range(self.num)]
         for i in range(self.num):
             for j in range(i+1, self.num):
                 dist = utils.euclid_dist(self.locations[i], self.locations[j])
@@ -32,15 +33,16 @@ class DistNetwork(Network):
         """connectivity probability"""
         return np.exp(- d ** 2 / 2 / self.lambda_d ** 2)
 
-    def disp_network(self):
+    def disp_network(self, show_pm=True):
         """display the network connectivity"""
         plt.figure(figsize=(8, 8))
         for loc in self.locations:
             plt.scatter(loc[0], loc[1], color='lightskyblue', s=100)
-        for pacemaker in self.pacemakers:
-            x = self.locations[pacemaker][0]
-            y = self.locations[pacemaker][1]
-            plt.scatter(x, y, color='lightskyblue', s=50, edgecolors=['r'], )
+        if show_pm:
+            for pacemaker in self.pacemakers:
+                x = self.locations[pacemaker][0]
+                y = self.locations[pacemaker][1]
+                plt.scatter(x, y, color='lightskyblue', s=50, edgecolors=['r'], )
         for edge in self.edges:
             x1 = self.locations[edge[0]][0]
             y1 = self.locations[edge[0]][1]
