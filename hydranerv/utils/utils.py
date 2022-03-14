@@ -57,25 +57,65 @@ def min_max_norm(l, rescale=1, offset=0):
         return [0 for _ in l]
     return [rescale * (x - minv) / (maxv - minv) + offset for x in l]
 
-def cluster_spikes(spike_train, mul=5):
-    """Separate spikes to clusters and return a dictionary"""
-    res = defaultdict(list)
-    n = len(spike_train)
-    if n == 0:
-        return res
-    if n <= 2:
-        res[0] = spike_train
-        return res
+# def cluster_spikes(spike_train, mul=5):
+#     """Separate spikes to clusters and return a dictionary"""
+#     res = defaultdict(list)
+#     n = len(spike_train)
+#     if n == 0:
+#         return res
+#     if n <= 2:
+#         res[0] = spike_train
+#         return res
 
-    typical_isi = spike_train[1] - spike_train[0]
-    j = 0
-    res[0].append(spike_train[0])
-    for i in range(1, n):
-        if spike_train[i] - spike_train[i-1] >= typical_isi * mul:
-            j += 1
-        res[j].append(spike_train[i])
-    return res
+#     typical_isi = spike_train[1] - spike_train[0]
+#     j = 0
+#     res[0].append(spike_train[0])
+#     for i in range(1, n):
+#         if spike_train[i] - spike_train[i-1] >= typical_isi * mul:
+#             j += 1
+#         res[j].append(spike_train[i])
+#     return res
+
+def cluster_peaks(peaks, min_cb_interval, realign=True):
+    """Separate peaks into different clusters based on min_cb_interval(in frame numbers)"""
+    clusters = [[]]
+
+    # Clustering peaks
+    for j in range(len(peaks)-1):
+        pk = peaks[j]
+        pk_nxt = peaks[j+1]
+        clusters[-1].append(pk)
+        if pk_nxt - pk < min_cb_interval:
+            pass
+        else:
+            clusters.append([])
+
+    clusters[-1].append(peaks[-1])
+
+    # Subtracting offsets
+    indices_to_keep = []
+    for i in range(len(clusters)):
+        cluster = clusters[i]
+        if len(cluster) >= 2:
+            indices_to_keep.append(i)
+        if realign:
+            offset = cluster[0]
+            for j in range(len(cluster)):
+                cluster[j] -= offset
+
+    return np.array(clusters, dtype=list)[indices_to_keep]
 
 
+def transpose_2d_list(list2d):
+    """Returns a transposed 2d list"""
 
+    maxlen = max([len(l) for l in list2d])
+    for j in range(len(list2d)):
+        list2d[j].extend([None]*(maxlen-len(list2d[j])))
 
+    list2d = np.array(list2d).T.tolist()
+
+    for j in range(len(list2d)):
+        list2d[j] = [x for x in list2d[j] if x]
+
+    return list2d

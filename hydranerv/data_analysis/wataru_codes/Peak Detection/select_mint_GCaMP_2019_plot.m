@@ -4,8 +4,8 @@ close all; clear; clc
 format compact
 %% set parameters
 clear;
-fpath = '/Users/hengjiwang/Documents/hydrafiles/nerve/videos/wataru/Fig 3/Osmo/Ctr/csv/'; % path to the intensity file 
-fname = '06_Osm_iGCaMP_H03_ContHM_06261700006'; % name of the intensity txt file %exclude text
+fpath = '/Users/hengjiwang/Documents/hydrafiles/nerve/videos.nosync/wataru/Fig 3/Osmo/High/substacks/data/'; % path to the intensity file 
+fname = '6_4'; % name of the intensity txt file %exclude text
 bkgname = ''; % '' if no bkg file
 spath = fpath; % path to save result
 figpath = fpath;
@@ -13,7 +13,7 @@ framerate = 2; %fps
 
 %% process data
 % read data
-mint = dlmread([fpath fname '.csv'],',',1,1);
+mint = dlmread([fpath fname '.csv'],',',1,2);
 mint = mint(:, 1);
 mint = reshape(mint,1,[]);
 if ~isempty(bkgname)
@@ -179,7 +179,7 @@ for ii = 1:size(cb_time_bin,1)
 end
 plot(t, dff_filt);
 scatter(cb_locs_time,dff_filt(cb_locs),'r.');
-xlim([1 endtime]);
+xlim([0 endtime]);
 ylim(ysc_filt)
 ylabel('dF/F'); title('CB')
 subplot(2,2,3); hold on
@@ -190,7 +190,7 @@ for ii = 1:size(cb_time_bin,1)
 end
 plot(t, ddff);
 scatter(cb_locs_time,ddff(cb_locs-1),'r.');
-xlim([1 endtime]);
+xlim([0 endtime]);
 ylim(ysc)
 xlabel('Time (min)')
 ylabel('d(dF/F)')
@@ -202,7 +202,7 @@ for ii = 1:size(rp_time_bin,1)
 end
 plot(t, dff_filt);
 scatter(rp_locs_time,dff_filt(rp_locs),'r.');
-xlim([1 endtime]);
+xlim([0 endtime]);
 ylim(ysc_filt)
 ylabel('dF/F'); title('RP')
 subplot(2,2,4); hold on
@@ -212,102 +212,14 @@ for ii = 1:size(rp_time_bin,1)
 end
 plot(t, ddff);
 scatter(rp_locs_time,ddff(rp_locs-1),'r.');
-xlim([1 endtime]);
+xlim([0 endtime]);
 ylim(ysc)
 xlabel('Time (min)')                   %JS: convert time to min
 ylabel('d(dF/F)')
 
 saveas(gcf,[figpath fname '_detection.fig']);
 
-%% display result
-% ldisp(table((1:length(rp_locs))',rp_locs','variablenames',{'number','peak_time'}))
+%% save time bins
+writematrix(cb_locs, [fpath fname '_cb_locs.txt']);
+% writematrix(rp_locs, [fpath fname '_rp_locs.txt']);
 
-if 0
-%% add rp2
-rp2_locs = []; % [vector], or [], modify manually
-rp2_locs = intersect(rp_locs,rp2_locs);
-rp1_locs = setdiff(rp_locs,rp2_locs);
-rp2_manual = []; % put the undetected rp2 here
-rp2_locs = [rp2_locs,rp2_manual]; % final result is a concatenation of the automated ones and manual ones
-
-%% Make Raster plots
-
-Raster_for_CBRP_073017
-
-saveas(gcf,[figpath fname '_raster.fig']);
-
-%% Calculate CB RP total peaks, duration, frequency 
-
-cb_peaks = length(cb_locs_time)   % #of CB peaks
-
-cb_length1 = size(cb_time_bin); cb_length = cb_length1(1);
-
-cb_total_length=0;
-for i = 1:cb_length
-   cb_calc = cb_time_bin(i,2) - cb_time_bin(i,1);
-   cb_total_length = cb_total_length + cb_calc; 
-end
-cb_total_length          % total duration of CB session
-
-cb_frequency = cb_peaks / cb_total_length   % CB firing frequency per minute
-
-rp_peaks = length(rp_locs_time)   % #of rp peaks
-
-rp_length1 = size(rp_time_bin); rp_length = rp_length1(1);
-
-rp_total_length=0;
-for i = 1:rp_length
-   rp_calc = rp_time_bin(i,2) - rp_time_bin(i,1);
-   rp_total_length = rp_total_length + rp_calc; 
-end
-rp_total_length          % total duration of rp session
-
-rp_frequency = rp_peaks / rp_total_length   % rp firing frequency per minute
-
-%% sliding window for RP raster plot practice
-
-
-
-duration = 120; % in minutes for the recording 
-windowsize = 2; %minutes - 15 to match chris     % play around here
-framerate = 5; %fps                                          THIS PARAMETER CAN BE CHANGED
-frame_number =  120*60*framerate;     %number of total frame, can input this %initially movie param number
-
-endtime = (1/framerate) * (frame_number-1) ./ 60;  %create time vector
-t = linspace(0,endtime,frame_number);
-
-windowframes = framerate * windowsize * 60; %calculate window size in frames
-windowaveragetimes = t(windowframes+1:(frame_number-(windowframes+1)));
-
-rp_b = zeros(frame_number, 1);   rp_number = length(rp_locs);   % rp_b will be the binary of the raster rp peaks 
-
-for p = 1:rp_number                                % now its binary
-    rp_b(rp_locs(p)) = 1;
-end
-
-
-
-for i = 1:length(windowaveragetimes)
-    windowaverage(i) = mean(rp_b(i:i+windowframes)) - mean(rp_b(i+windowframes:i+2*windowframes));
-end
-
-smooth(windowaverage, 10);     % smoothing can change parameter
-
-%% plot result
-
-
-plot(windowaveragetimes, windowaverage)
-ylabel('Moving Window Frequency')
-xlabel('Time (Min)'); 
-
-%% save results
-save([spath fname '.mat']);    
-  
-    
-%% print result for RP1 081018
-
-cbResult = cb_locs'
-
-rpResult = rp_locs'
-
-end
