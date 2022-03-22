@@ -20,21 +20,24 @@ class Network:
         self.t_syn = t_syn
         self.wnoise = wnoise
         self.is_semi_pm = is_semi_pm
-        self.i_stim = 1200
-        self.t_stim = .1
+        self.a_stim = 200000
+        self.i_stim = 10000
+        self.t_stim = 1
         self.setup()
         self.reset()
 
     def setup(self):
         """set up the structure"""
         self.neurons = []
+        np.random.seed(0)
         for i in range(self.num):
             if i in self.pacemakers:
-                self.neurons.append(Neuron(self.dt, self.tmax, np.random.uniform(-self.wnoise, self.wnoise), True, self.t_ref))
+                nrn = Neuron(self.dt, self.tmax, np.random.uniform(-self.wnoise, self.wnoise), True, self.t_ref)
+                if self.is_semi_pm:
+                    nrn.k_in = 2 * nrn.k_in
+                self.neurons.append(nrn)
             elif self.is_semi_pm:
                 nrn = Neuron(self.dt, self.tmax, np.random.uniform(-self.wnoise, self.wnoise), True, self.t_ref)
-                nrn.k_in = nrn.k_in / 2
-                # nrn.s = .002
                 self.neurons.append(nrn)
             else:
                 self.neurons.append(Neuron(self.dt, self.tmax, np.random.uniform(-self.wnoise, self.wnoise), False, self.t_ref))
@@ -82,12 +85,14 @@ class Network:
 
         return ic
 
-    def step(self, nrns=[]):
+    def step(self, stim_nrns=[]):
         """step function"""
         voltages = [x.v() for x in self.neurons]
         for i, neuron in enumerate(self.neurons):
-            if i in nrns:
+            if i in stim_nrns:
                 neuron.step(self.i_c(i, voltages) + self.i_stim)
+                # neuron.step(self.i_c(i, voltages), mech_stim=self.a_stim)
+                # print('neuron #' + str(i) + ' is stimulated at ' + str(round(self.t + self.dt, 5)) + 's')
             else:
                 neuron.step(self.i_c(i, voltages))
         self.t += self.dt
@@ -96,15 +101,15 @@ class Network:
         """run simulation"""
         self.reset()
         time_axis = np.arange(self.dt, self.tmax, self.dt)
-        stim_nrns = []
         for t in tqdm(time_axis):
+            stim_nrns = []
             for t_st in stim:
                 if 0 <= t - t_st < self.t_stim:
                     stim_nrns = stim[t_st]
                     break
             self.step(stim_nrns)
 
-    def disp(self, figsize=(10, 6), style='spike', ineurons=None, skip=1):
+    def disp(self, figsize=(10, 6), style='spike', ineurons=None, skip=1, savefig=None):
         """display simulation results"""
 
         ineurons = range(self.num) if ineurons is None else ineurons
@@ -113,9 +118,7 @@ class Network:
             fig, ax1 = plt.subplots(1, 1, figsize=figsize)
             for i in ineurons:
                 neuron = self.neurons[i]
-                ax1.vlines(neuron.spikes, i + .1, i + .9)
-            ax1.set_xlabel('time (s)')
-            ax1.set_ylabel('neuron #')
+                ax1.vlines(neuron.spikes, i + .1, i + .9, lw=1, color='k')
 
         elif style == 'trace':
             time_axis = np.arange(0, self.tmax, self.dt)
@@ -124,12 +127,15 @@ class Network:
                 neuron = self.neurons[i]
                 ax1.plot(time_axis[skip::skip], [(x + 75) / 110 + i for x in neuron.v_train[skip::skip]], lw=.75)
                 # ax1.plot(time_axis[skip::skip], np.array(neuron.v_train[skip::skip]) )
-            ax1.set_xlabel('time (s)')
-            ax1.set_ylabel('neuron #')
-
         # ax1.plot(time_axis, utils.min_max_norm(self.pcontroller.p_train[1:], .9, self.num), 'k--')
         ax1.set_ylim(0, self.num + 1)
-        # ax1.set_xlim(600, 950)
+        ax1.set_xlim(0, self.tmax)
+        plt.xticks(fontsize=20)
+        plt.yticks(fontsize=20)
+        plt.xlabel('time (s)', fontsize=20)
+        plt.ylabel('neuron #', fontsize=20)
+        if savefig:
+            plt.savefig(savefig, dpi=300, bbox_inches='tight')
         plt.show()
 
     def disp_conn_mat(self):

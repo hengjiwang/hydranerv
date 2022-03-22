@@ -77,14 +77,14 @@ class Neuron:
         """leak current"""
         return self.g_l * (self.v() - self.e_l)
 
-    def i_s(self):
+    def i_s(self, mech_stim):
         """mechanosensitive current"""
         if self.ispacemaker:
-            return self.g_s / (1 + self.k_b * np.exp(- self.s * (self.sigma_m() / self.m) ** self.q)) * (self.v() - self.e_s)
+            return self.g_s / (1 + self.k_b * np.exp(- self.s * ((self.sigma_m() + mech_stim) / self.m) ** self.q)) * (self.v() - self.e_s)
         else:
             return 0
 
-    def step(self, i_ex=0):
+    def step(self, i_ex=0, mech_stim=0):
         """step function"""
         v = self.v()
         sigma_a = self.sigma_a()
@@ -108,7 +108,7 @@ class Neuron:
 
         else:
             # Derivatives
-            dv = 1 / self.c_m * (- self.i_l() - self.i_s() + i_ex)
+            dv = 1 / self.c_m * (- self.i_l() - self.i_s(mech_stim) + i_ex)
             da = - self.sigma_a() / self.tau_p
             dw = self.k_in
 
