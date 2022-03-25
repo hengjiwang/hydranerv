@@ -85,19 +85,22 @@ class Network:
 
         return ic
 
-    def step(self, stim_nrns=[]):
+    def step(self, stim_nrns=[], stim_type='mechanical'):
         """step function"""
         voltages = [x.v() for x in self.neurons]
         for i, neuron in enumerate(self.neurons):
             if i in stim_nrns:
-                neuron.step(self.i_c(i, voltages) + self.i_stim)
+                if stim_type == 'mechanical':
+                    neuron.step(self.i_c(i, voltages), mech_stim=self.a_stim)
+                elif stim_type == 'electrical':
+                    neuron.step(self.i_c(i, voltages) + self.i_stim)
                 # neuron.step(self.i_c(i, voltages), mech_stim=self.a_stim)
                 # print('neuron #' + str(i) + ' is stimulated at ' + str(round(self.t + self.dt, 5)) + 's')
             else:
                 neuron.step(self.i_c(i, voltages))
         self.t += self.dt
 
-    def run(self, stim={}):
+    def run(self, stim={}, stim_type='mechanical'):
         """run simulation"""
         self.reset()
         time_axis = np.arange(self.dt, self.tmax, self.dt)
@@ -107,9 +110,9 @@ class Network:
                 if 0 <= t - t_st < self.t_stim:
                     stim_nrns = stim[t_st]
                     break
-            self.step(stim_nrns)
+            self.step(stim_nrns, stim_type)
 
-    def disp(self, figsize=(10, 6), style='spike', ineurons=None, skip=1, savefig=None):
+    def disp(self, figsize=(10, 6), style='spike', ineurons=None, skip=1, savefig=None, dpi=300):
         """display simulation results"""
 
         ineurons = range(self.num) if ineurons is None else ineurons
@@ -135,7 +138,7 @@ class Network:
         plt.xlabel('time (s)', fontsize=20)
         plt.ylabel('neuron #', fontsize=20)
         if savefig:
-            plt.savefig(savefig, dpi=300, bbox_inches='tight')
+            plt.savefig(savefig, dpi=dpi, bbox_inches='tight')
         plt.show()
 
     def disp_conn_mat(self):
