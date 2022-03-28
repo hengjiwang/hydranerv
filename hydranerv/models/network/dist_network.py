@@ -6,11 +6,12 @@ from hydranerv.utils import utils
 
 class DistNetwork(Network):
     """a model for neuronal networks where the connectivity is exponentially decay with distance"""
-    def __init__(self, num=10, gc=1, dt=.01, tmax=1000, pacemakers=[0], t_ref=.1, conn_type='gap_junction', t_syn=.01, wnoise=0, is_semi_pm=False, lambda_d=.1):
+    def __init__(self, num=10, gc=1, dt=.01, tmax=1000, pacemakers=[0], t_ref=.1,
+                 conn_type='gap_junction', t_syn=.01, wnoise=0, is_semi_pm=False, lambda_d=.1, seed=0):
         """constructor"""
         self.locations = []
         self.lambda_d = lambda_d
-        super().__init__(num, [], gc, dt, tmax, pacemakers, t_ref, conn_type, t_syn, wnoise, is_semi_pm)
+        super().__init__(num, [], gc, dt, tmax, pacemakers, t_ref, conn_type, t_syn, wnoise, is_semi_pm, seed)
 
     def set_locations(self):
         """set locations for neurons"""

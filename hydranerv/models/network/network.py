@@ -7,13 +7,15 @@ from hydranerv.models.network.neuron import Neuron
 
 class Network:
     """a model for neuronal networks"""
-    def __init__(self, num=10, edges=[], gc=1, dt=.01, tmax=1000, pacemakers=[0], t_ref=.1, conn_type='gap_junction', t_syn=.01, wnoise=0, is_semi_pm=False):
+    def __init__(self, num=10, edges=[], gc=1, dt=.01, tmax=1000, pacemakers=[0], t_ref=.1,
+                 conn_type='gap_junction', t_syn=.01, wnoise=0, is_semi_pm=False, seed=0):
         """constructor"""
         self.num = num
         self.edges = edges
         self.gc = gc
         self.dt = dt
         self.tmax = tmax
+        self.seed = seed
         self.pacemakers = pacemakers
         self.t_ref = t_ref
         self.conn_type = conn_type
@@ -29,7 +31,7 @@ class Network:
     def setup(self):
         """set up the structure"""
         self.neurons = []
-        np.random.seed(0)
+        np.random.seed(self.seed)
         for i in range(self.num):
             if i in self.pacemakers:
                 nrn = Neuron(self.dt, self.tmax, np.random.uniform(-self.wnoise, self.wnoise), True, self.t_ref)
