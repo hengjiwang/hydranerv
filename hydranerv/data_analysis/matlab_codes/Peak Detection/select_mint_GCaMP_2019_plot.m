@@ -4,8 +4,9 @@ close all; clear; clc
 format compact
 %% set parameters
 clear;
-fpath = '/Users/hengjiwang/Documents/hydrafiles/nerve/videos.nosync/wataru/Fig 3/Osmo/High/substacks/data/'; % path to the intensity file 
-fname = '6_4'; % name of the intensity txt file %exclude text
+fpath = '/Users/hengjiwang/Documents/hydrafiles/nerve/videos.nosync/wataru/Fig 3/Osmo/Low/substacks/data/'; % path to the intensity file 
+% fpath = '/Users/hengjiwang/Documents/hydrafiles/nerve/videos.nosync/josh/data/'; % path to the intensity file 
+fname = '3_5'; % name of the intensity txt file %exclude text
 bkgname = ''; % '' if no bkg file
 spath = fpath; % path to save result
 figpath = fpath;

@@ -1,7 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import random
+import pandas as pd
+import random, os
 from collections import defaultdict
+from . import disp
 
 
 def euler_odeint(rhs, y, T, dt, **kwargs):
@@ -102,7 +104,7 @@ def cluster_peaks(peaks, min_cb_interval, realign=True):
             offset = cluster[0]
             for j in range(len(cluster)):
                 cluster[j] -= offset
-
+    
     return np.array(clusters, dtype=list)[indices_to_keep]
 
 
@@ -119,3 +121,42 @@ def transpose_2d_list(list2d):
         list2d[j] = [x for x in list2d[j] if x]
 
     return list2d
+
+def get_clusters(nmovie, fpath='./cb_locs/wataru_data/ctr/', display=True, offsets=None, realign=True):
+    if display:
+        fig = plt.figure(figsize=(15, 5))
+        ax = fig.add_subplot(111)
+    inc = 0
+    # Read txt files
+    filelist = sorted(os.listdir(fpath))
+    clusters_all = []
+    clusters_per_video = []
+
+    for imovie in range(1, nmovie+1):
+
+        # Extract peak locations
+        locs = []
+        offset = 0
+        for filename in filelist:
+            if filename.endswith(".txt") and filename.startswith(str(imovie)):
+                if offsets:
+                    offset = offsets[imovie-1][int(filename.split('_cb_locs')[0][-1])-1]
+                locs.append(pd.read_csv(fpath + filename, header=None).values[0] + offset)
+
+        # Cluster the peaks
+        clusters = []
+        for peaks in locs:
+            clusters.extend(list(cluster_peaks(peaks, 50, realign=realign)))
+        
+        # Plot the cluster spikes
+        if display:
+            disp.add_spike_trains(ax, clusters, 2, lw=1, color=randomcolor(), inc=inc)
+        clusters_all.extend(clusters)
+        clusters_per_video.append(clusters)
+        inc += len(clusters)
+    
+    if display:
+        plt.xlim(0, 300)
+        plt.ylim(0, inc)
+        plt.show()
+    return clusters_all, clusters_per_video
