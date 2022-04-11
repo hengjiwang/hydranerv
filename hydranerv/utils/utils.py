@@ -48,10 +48,23 @@ def euclid_dist(pt1, pt2):
     """Calculates the Euclidean distance between pt1 and pt2"""
     return np.sqrt((pt1[0] - pt2[0])**2 + (pt1[1] - pt2[1])**2)
 
-
 def std_euclid_dist(pt1, pt2, std=(1, 1)):
     """Calculates the standardized Euclidean distance between pt1 and pt2"""
     return np.sqrt(((pt1[0] - pt2[0]) / std[0])**2 + ((pt1[1] - pt2[1]) / std[1])**2)
+
+def cyl_dist(pt1, pt2):
+    """Calculates the distance between pt1 and pt2 on a cylindrical surface"""
+    r1, phi1, z1 = pt1
+    r2, phi2, z2 = pt2
+
+    if r1 != r2:
+        raise Exception('pt1 and pt2 must be on the same cylindrical surface!')
+
+    phi_diff = abs(phi2 - phi1)
+    phi_diff = phi_diff if phi_diff < np.pi else 2 * np.pi - phi_diff
+
+    return np.sqrt((r1 * (phi_diff)) ** 2 + (z2 - z1) ** 2)
+
 
 def min_max_norm(l, rescale=1, offset=0):
     minv, maxv = min(l), max(l)
@@ -104,7 +117,7 @@ def cluster_peaks(peaks, min_cb_interval, realign=True):
             offset = cluster[0]
             for j in range(len(cluster)):
                 cluster[j] -= offset
-    
+
     return np.array(clusters, dtype=list)[indices_to_keep]
 
 
@@ -147,14 +160,14 @@ def get_clusters(nmovie, fpath='./cb_locs/wataru_data/ctr/', display=True, offse
         clusters = []
         for peaks in locs:
             clusters.extend(list(cluster_peaks(peaks, 50, realign=realign)))
-        
+
         # Plot the cluster spikes
         if display:
             disp.add_spike_trains(ax, clusters, 2, lw=1, color=randomcolor(), inc=inc)
         clusters_all.extend(clusters)
         clusters_per_video.append(clusters)
         inc += len(clusters)
-    
+
     if display:
         plt.xlim(0, 300)
         plt.ylim(0, inc)
