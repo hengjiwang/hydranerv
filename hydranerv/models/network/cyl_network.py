@@ -68,13 +68,19 @@ class CylNetwork(Network):
         ax.plot_surface(x, y, z, color='lightgreen', alpha=.2)
 
         # Plot neurons
-        for loc in self.locations:
+        for i, loc in enumerate(self.locations):
             phi = loc[0]
             z = loc[1]
-            ax.scatter(self.rho * np.cos(phi),
-                       self.rho * np.sin(phi),
-                       z,
-                       color='#1f77b4', alpha=1)
+            if show_pm and i in self.pacemakers:
+                ax.scatter(self.rho * np.cos(phi),
+                        self.rho * np.sin(phi),
+                        z,
+                        color='#1f77b4', alpha=1, edgecolors=['r'])
+            else:
+                ax.scatter(self.rho * np.cos(phi),
+                        self.rho * np.sin(phi),
+                        z,
+                        color='#1f77b4', alpha=1)
 
         # plot edges
         for edge in self.edges:
