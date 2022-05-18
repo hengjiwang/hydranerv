@@ -51,11 +51,12 @@ class Neuron:
         self.spikes = []
 
         # Reset values
+        self.w0 = 25000
         self.t = 0 # s
         self.t_last = - np.inf # s
         self.v_train.append(self.v_r)
         self.sigma_a_train.append(0)
-        self.sigma_w_train.append(25000 + self.wnoise)
+        self.sigma_w_train.append(self.w0 + self.wnoise)
 
     def v(self):
         """get v"""
@@ -142,7 +143,7 @@ class Neuron:
         time_axis = np.arange(self.dt, self.tmax, self.dt)
         plt.figure()
         plt.plot(time_axis, self.v_train[1:])
-        plt.xlim(550, 950)
+        # plt.xlim(550, 950)
         plt.xlabel('time (s)')
         plt.ylabel('membrane potential (mV)')
         plt.show()

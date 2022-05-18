@@ -45,7 +45,7 @@ class CylEvenNetwork(Network):
                 nex = i * self.num_cir + j + 1
                 if j == self.num_cir - 1:
                     nex = i * self.num_cir
-                if np.random.rand() < self.prob_cir or i <= 1 or i == self.num_lon - 1:
+                if np.random.rand() < self.prob_cir or i <= 0 or i >= self.num_lon - 1:
                     self.add_edge((curr, nex))
 
 
@@ -89,6 +89,16 @@ class CylEvenNetwork(Network):
                     [self.rho * np.sin(phi1), self.rho * np.sin(phi2)],
                     [z1, z2],
                     color='k', lw=.5)
+
+        # make the panes transparent
+        ax.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+        ax.yaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+        ax.zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+        # make the grid lines transparent
+        ax.xaxis._axinfo["grid"]['color'] =  (1,1,1,0)
+        ax.yaxis._axinfo["grid"]['color'] =  (1,1,1,0)
+        ax.zaxis._axinfo["grid"]['color'] =  (1,1,1,0)
+
 
         ax.set_xlabel('x')
         ax.set_ylabel('y')

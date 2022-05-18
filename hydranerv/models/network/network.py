@@ -79,7 +79,7 @@ class Network:
         for neighbor in neighbors:
 
             if self.conn_type == 'gap_junction':
-                vneighbor = voltages[neighbor] if voltages[neighbor] < self.neurons[neighbor].v_th else 20
+                vneighbor = voltages[neighbor] if voltages[neighbor] < self.neurons[neighbor].v_th else self.neurons[neighbor].v_spike
                 ic += self.gc * (vneighbor - v)
             elif self.conn_type == 'synapse':
                 if self.t < self.neurons[neighbor].t_last + self.t_syn:
