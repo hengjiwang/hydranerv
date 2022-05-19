@@ -138,10 +138,13 @@ class Neuron:
         for _ in time_axis:
             self.step()
 
-    def disp(self):
+    def disp(self, figsize=None):
         """display simulation results"""
         time_axis = np.arange(self.dt, self.tmax, self.dt)
-        plt.figure()
+        if not figsize:
+            plt.figure()
+        else:
+            plt.figure(figsize=figsize)
         plt.plot(time_axis, self.v_train[1:])
         # plt.xlim(550, 950)
         plt.xlabel('time (s)')

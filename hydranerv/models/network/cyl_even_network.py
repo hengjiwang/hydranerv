@@ -22,8 +22,8 @@ class CylEvenNetwork(Network):
     def set_locations(self):
         """set locations for neurons"""
         dphi = 2 * np.pi / self.num_cir
-        dz = 1 / self.num_lon
-        for i, z in enumerate(np.arange(1-dz, -dz, -dz)):
+        dz = 1 / (self.num_lon - 1)
+        for i, z in enumerate(np.arange(1, -dz/2, -dz)):
             for j, phi in enumerate(np.arange(0, 2 * np.pi, dphi)):
                 self.locations.append((phi, z))
 
