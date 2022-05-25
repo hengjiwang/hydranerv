@@ -1,14 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from hydranerv.models.network.neuron import Neuron
-# from sklearn.cluster import k_means
-# from sympy import divisor_sigma
 
 class StochNeuron(Neuron):
-    """a lif-based model for hydra cb neuron"""
+    """a stochastic version neuron model"""
     def __init__(self, dt=.01, tmax=1000, wnoise=0, ispacemaker=True, t_ref=.1):
-        """configurator"""
-
+        """constructor"""
         super().__init__(dt, tmax, wnoise, ispacemaker, t_ref)
 
     def i_s(self, mech_stim):

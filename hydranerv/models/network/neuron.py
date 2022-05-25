@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 class Neuron:
     """a lif-based model for hydra cb neuron"""
     def __init__(self, dt=.01, tmax=1000, wnoise=0, ispacemaker=True, t_ref=.1):
-        """configurator"""
+        """constructor"""
 
         # Simulation parameters
         self.tmax = tmax
@@ -138,17 +138,27 @@ class Neuron:
         for _ in time_axis:
             self.step()
 
-    def disp(self, figsize=None):
+    def disp(self, figsize=None, disp_stress=False):
         """display simulation results"""
         time_axis = np.arange(self.dt, self.tmax, self.dt)
         if not figsize:
-            plt.figure()
+            fig = plt.figure()
         else:
-            plt.figure(figsize=figsize)
-        plt.plot(time_axis, self.v_train[1:])
-        # plt.xlim(550, 950)
-        plt.xlabel('time (s)')
-        plt.ylabel('membrane potential (mV)')
+            fig = plt.figure(figsize=figsize)
+
+        if not disp_stress:
+            plt.plot(time_axis, self.v_train[1:])
+            # plt.xlim(550, 950)
+            plt.xlabel('time (s)')
+            plt.ylabel('membrane potential (mV)')
+        else:
+            ax1, ax2 = fig.subplots(2,1)
+            ax1.plot(time_axis, self.v_train[1:])
+            # ax2.plot(time_axis, np.array(self.sigma_a_train[1:]) + np.array(self.sigma_w_train[1:]), 'k')
+            ax2.plot(time_axis, np.array(self.sigma_w_train[1:]), 'k')
+            ax2.set_xlabel('time (s)')
+            ax1.set_ylabel('V')
+            ax2.set_ylabel(r'$\sigma_m$')
         plt.show()
 
 if __name__ == '__main__':

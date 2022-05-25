@@ -87,7 +87,7 @@ class Network:
 
         return ic
 
-    def step(self, stim_nrns=[], stim_type='mechanical'):
+    def step(self, stim_nrns=set(), stim_type='mechanical'):
         """step function"""
         voltages = [x.v() for x in self.neurons]
         for i, neuron in enumerate(self.neurons):
@@ -110,11 +110,11 @@ class Network:
             stim_nrns = []
             for t_st in stim:
                 if 0 <= t - t_st < self.t_stim:
-                    stim_nrns = stim[t_st]
+                    stim_nrns = set(stim[t_st])
                     break
             self.step(stim_nrns, stim_type)
 
-    def disp(self, figsize=(10, 6), style='spike', ineurons=None, skip=1, savefig=None, dpi=300):
+    def disp(self, figsize=(10, 6), xlim=None, style='spike', ineurons=None, skip=1, savefig=None, dpi=300):
         """display simulation results"""
 
         ineurons = range(self.num) if ineurons is None else ineurons
@@ -134,7 +134,10 @@ class Network:
                 # ax1.plot(time_axis[skip::skip], np.array(neuron.v_train[skip::skip]) )
         # ax1.plot(time_axis, utils.min_max_norm(self.pcontroller.p_train[1:], .9, self.num), 'k--')
         ax1.set_ylim(0, self.num + 1)
-        ax1.set_xlim(0, self.tmax)
+        if xlim:
+            ax1.set_xlim(xlim[0], xlim[1])
+        else:
+            ax1.set_xlim(0, self.tmax)
         plt.xticks(fontsize=20)
         plt.yticks(fontsize=20)
         plt.xlabel('time (s)', fontsize=20)
