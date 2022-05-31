@@ -53,6 +53,7 @@ class RPNeuron:
     def i_s(self, sigma_m):
         """mechanosensitive current"""
         return self.g_s / (1 + self.k_b * np.exp(- self.s * (sigma_m / self.m) ** self.q)) * (self.v() - self.e_s)
+        # return -100
 
     def step(self, sigma_m, i_ext=0):
         """step function"""

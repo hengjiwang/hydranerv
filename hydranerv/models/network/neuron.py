@@ -153,8 +153,8 @@ class Neuron:
         else:
             ax1, ax2 = fig.subplots(2,1)
             ax1.plot(time_axis, self.v_train[1:])
-            ax2.plot(time_axis, np.array(self.sigma_a_train[1:]) + np.array(self.sigma_w_train[1:]), 'k')
-            # ax2.plot(time_axis, np.array(self.sigma_w_train[1:]), 'k')
+            # ax2.plot(time_axis, np.array(self.sigma_a_train[1:]) + np.array(self.sigma_w_train[1:]), 'k')
+            ax2.plot(time_axis, np.array(self.sigma_w_train[1:]), 'k')
             ax2.set_xlabel('time (s)')
             ax1.set_ylabel('V')
             ax2.set_ylabel(r'$\sigma_m$')
