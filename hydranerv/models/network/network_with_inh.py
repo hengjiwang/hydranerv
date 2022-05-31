@@ -26,7 +26,7 @@ class NetworkWithInh(Network):
         # update inhibition current
         i_inh = self.i_inh_train[-1]
         for t_inh in self.inh_moments:
-            if 0 <= np.abs(self.t - t_inh) < self.dt / 2:
+            if np.abs(self.t - t_inh) < self.dt / 2:
                 i_inh += self.a_inh
         i_inh -= self.dt * i_inh / self.tau_inh
 

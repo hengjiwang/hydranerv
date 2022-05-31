@@ -15,7 +15,6 @@ class Neuron:
         self.ispacemaker = ispacemaker
 
         # LIF parameters
-        self.dt = dt # s
         self.c_m = 50 # nF
         self.v_th = -55 # mV
         self.v_r = -75 # mV
@@ -154,8 +153,8 @@ class Neuron:
         else:
             ax1, ax2 = fig.subplots(2,1)
             ax1.plot(time_axis, self.v_train[1:])
-            # ax2.plot(time_axis, np.array(self.sigma_a_train[1:]) + np.array(self.sigma_w_train[1:]), 'k')
-            ax2.plot(time_axis, np.array(self.sigma_w_train[1:]), 'k')
+            ax2.plot(time_axis, np.array(self.sigma_a_train[1:]) + np.array(self.sigma_w_train[1:]), 'k')
+            # ax2.plot(time_axis, np.array(self.sigma_w_train[1:]), 'k')
             ax2.set_xlabel('time (s)')
             ax1.set_ylabel('V')
             ax2.set_ylabel(r'$\sigma_m$')
@@ -164,4 +163,4 @@ class Neuron:
 if __name__ == '__main__':
     nrn = Neuron()
     nrn.run()
-    nrn.disp()
+    nrn.disp(disp_stress=True)
