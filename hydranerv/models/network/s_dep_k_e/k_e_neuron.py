@@ -13,6 +13,7 @@ class KENeuron(Neuron):
     def get_k_e(self):
         # return self.sigma_w() ** 3 / 30 / (29000)**2
         return self.sigma_w() / 40
+        # return 600
 
     def step(self, i_ex=0, mech_stim=0):
         """step function"""
