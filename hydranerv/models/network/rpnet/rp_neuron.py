@@ -14,16 +14,16 @@ class RPNeuron:
         self.c_m = 50 # nF
         self.v_th = -55 # mV
         self.v_r = -75 # mV
-        self.g_l = 1 # nS
+        self.g_l = .5 # 1 # nS
         self.e_l = self.v_r
         self.v_spike = 20 # mV
         self.t_pk = .0 # mV
         self.t_ref = t_ref # s
 
         # PIEZO channel parameters
-        self.g_s = 5 # nS
+        self.g_s = 1.5 # 5 # nS
         self.e_s = 10 # mV
-        self.s = .00277 # 1/Pa
+        self.s = .004 # .00277 # 1/Pa
         self.k_b = 106
         self.m = 25
         self.q = 1
@@ -53,6 +53,7 @@ class RPNeuron:
     def i_s(self, sigma_m):
         """mechanosensitive current"""
         return self.g_s / (1 + self.k_b * np.exp(- self.s * (sigma_m / self.m) ** self.q)) * (self.v() - self.e_s)
+        # return self.g_s * (self.v() - self.e_s)
         # return -100
 
     def step(self, sigma_m, i_ext=0):
