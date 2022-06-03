@@ -13,6 +13,7 @@ class CylEvenNetwork(Network):
         self.locations = [] # 2d matrix (phi, z)
         self.num_lon = num_lon
         self.num_cir = num_cir
+        self.num = self.num_cir * self.num_lon
         self.prob_lon = prob_lon
         self.prob_cir = prob_cir
         self.rho = rho
