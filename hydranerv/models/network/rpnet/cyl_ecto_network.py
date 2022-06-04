@@ -18,8 +18,10 @@ class CylEctoNetwork:
                  pm_cb=[],
                  t_ref=.1,
                  edges=None,
-                 tau_inh=5,
-                 a_inh=100,
+                 tau_inh_cb=5,
+                 tau_inh_rp=5,
+                 a_inh_cb=50,
+                 a_inh_rp=100,
                  lambda_d=(.1, .05),
                  seed=0):
         """constructor"""
@@ -67,8 +69,10 @@ class CylEctoNetwork:
                                   rho=.5,
                                   lambda_d=.15,
                                   seed=seed)
-        self.tau_inh = tau_inh
-        self.a_inh = a_inh
+        self.tau_inh_cb = tau_inh_cb
+        self.tau_inh_rp = tau_inh_rp
+        self.a_inh_cb = a_inh_cb
+        self.a_inh_rp = a_inh_rp
         self.edges = edges
         self.rho = .5
         self.lambda_d = lambda_d
@@ -164,8 +168,8 @@ class CylEctoNetwork:
                 rp = self.rpnet.neurons[j]
                 i_inh = self.i_inh['rp_to_cb'][(i, j)][-1]
                 if np.abs(self.t - self.dt - rp.t_last) < self.dt / 2:
-                    i_inh += self.a_inh
-                i_inh -= self.dt * i_inh / self.tau_inh
+                    i_inh += self.a_inh_rp
+                i_inh -= self.dt * i_inh / self.tau_inh_rp
                 self.i_inh['rp_to_cb'][(i, j)].append(i_inh)
                 i_inh_total += i_inh
             cb.step(self.cbnet.i_c(i, voltages['cb']) - i_inh_total)
@@ -178,8 +182,8 @@ class CylEctoNetwork:
                 cb = self.cbnet.neurons[j]
                 i_inh = self.i_inh['cb_to_rp'][(i, j)][-1]
                 if np.abs(self.t - self.dt - cb.t_last) < self.dt / 2:
-                    i_inh += self.a_inh
-                i_inh -= self.dt * i_inh / self.tau_inh
+                    i_inh += self.a_inh_cb
+                i_inh -= self.dt * i_inh / self.tau_inh_cb
                 self.i_inh['cb_to_rp'][(i, j)].append(i_inh)
                 i_inh_total += i_inh
             sigma_m = self.cbnet.neurons[0].sigma_m()

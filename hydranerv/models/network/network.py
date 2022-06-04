@@ -25,8 +25,8 @@ class Network:
         self.a_stim = 200000
         self.i_stim = 10000
         self.t_stim = 1
-        self.setup()
-        self.reset()
+        self.setup() # TODO: do this in children class instead
+        self.reset() # TODO: do this in children class instead
 
     def setup(self):
         """set up the structure"""

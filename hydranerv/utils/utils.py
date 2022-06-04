@@ -63,7 +63,7 @@ def cyl_dist(pt1, pt2):
     phi_diff = abs(phi2 - phi1)
     phi_diff = phi_diff if phi_diff < np.pi else 2 * np.pi - phi_diff
 
-    return np.sqrt((r1 * (phi_diff)) ** 2 + (z2 - z1) ** 2)
+    return np.sqrt((r1 * phi_diff) ** 2 + (z2 - z1) ** 2)
 
 
 def min_max_norm(l, rescale=1, offset=0):

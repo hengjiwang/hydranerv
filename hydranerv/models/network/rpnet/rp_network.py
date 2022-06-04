@@ -20,6 +20,7 @@ class RPNetwork(Network):
     def setup(self):
         """set up the structure"""
         self.neurons = []
+        self.edges = [] # TODO: this is because Network class constructor previously execuated setup
         np.random.seed(self.seed)
         for i in range(self.num):
             self.neurons.append(RPNeuron(self.dt, self.tmax, self.t_ref))
