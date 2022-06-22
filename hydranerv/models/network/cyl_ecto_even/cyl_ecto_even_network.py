@@ -11,8 +11,8 @@ class CylEctoEvenNetwork:
     def __init__(self,
                  dt=.01,
                  tmax=1000,
-                 num_cb=200,
-                 num_rp=200,
+                 num_lon=200,
+                 num_cir=200,
                  gc_cb=100,
                  gc_rp=100,
                  pm_cb=[],
@@ -29,8 +29,8 @@ class CylEctoEvenNetwork:
         """constructor"""
         self.dt = dt
         self.tmax = tmax
-        self.cbnet = CylEvenNetwork(num_lon=10,
-                                    num_cir=20,
+        self.cbnet = CylEvenNetwork(num_lon=num_lon,
+                                    num_cir=num_cir,
                                     gc=gc_cb,
                                     dt=dt,
                                     tmax=tmax,
@@ -45,8 +45,8 @@ class CylEctoEvenNetwork:
                                     rho=.5,
                                     seed=seed
                                     )
-        self.rpnet = CylRPEvenNetwork(num_lon=10,
-                                      num_cir=20,
+        self.rpnet = CylRPEvenNetwork(num_lon=num_lon,
+                                      num_cir=num_cir,
                                       gc=gc_rp,
                                       dt=dt,
                                       tmax=tmax,
@@ -77,14 +77,14 @@ class CylEctoEvenNetwork:
         self.edges = defaultdict(list)
 
         # add edges on hypostomal end (majorly cb -> rp)
-        for i in range(self.cbnet.num_cir):
-            for j in range(self.rpnet.num_cir):
+        for i in range(2*self.cbnet.num_cir):
+            for j in range(2*self.rpnet.num_cir):
                 if np.random.rand() < self.prob_cb_to_rp:
                     self.edges['cb_to_rp'].append((j, i))
 
         # add edges on peduncular end (majorly rp -> cb)
-        for i in range(self.cbnet.num - self.cbnet.num_cir, self.cbnet.num):
-            for j in range(self.rpnet.num - self.rpnet.num_cir, self.rpnet.num):
+        for i in range(self.cbnet.num - 2*self.cbnet.num_cir, self.cbnet.num):
+            for j in range(self.rpnet.num - 2*self.rpnet.num_cir, self.rpnet.num):
                 if np.random.rand() < self.prob_rp_to_cb:
                     self.edges['rp_to_cb'].append((i, j))
 
