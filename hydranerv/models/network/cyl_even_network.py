@@ -19,6 +19,7 @@ class CylEvenNetwork(Network):
         self.rho = rho
         super().__init__(num_lon * num_cir, [], gc, dt, tmax, pacemakers, t_ref, conn_type,
                         t_syn, wnoise, is_semi_pm, seed)
+        self.regions_cut = set()
 
     def set_locations(self):
         """set locations for neurons"""
@@ -49,6 +50,36 @@ class CylEvenNetwork(Network):
                 if np.random.rand() < self.prob_cir or i <= 0 or i >= self.num_lon - 1:
                     self.add_edge((curr, nex))
 
+    def cut(self, phi_start, phi_end, z_start, z_end):
+        """cut a specified region from the shell"""
+
+        # remove neurons
+        for i, nrn in enumerate(self.neurons):
+            if nrn is not None:
+                phi, z = self.locations[i]
+                if phi_start <= np.round(phi, 3) <= phi_end and z_start <= np.round(z, 3) <= z_end:
+                    self.neurons[i] = None
+                    self.locations[i] = None
+
+        # remove edges
+        for k, edge in enumerate(self.edges):
+            if edge is not None:
+                i, j = edge
+                if self.neurons[i] is None or self.neurons[j] is None:
+                    self.edges[k] = None
+
+        # remove neighbors
+        for i in range(self.num):
+            if self.neurons[i] is None:
+                self.neighbors[i] = []
+            else:
+                li = self.neighbors[i][:]
+                for j in self.neighbors[i]:
+                    if self.neurons[j] is None:
+                        li.remove(j)
+                self.neighbors[i] = li
+
+        self.regions_cut.add(((phi_start, phi_end), (z_start, z_end)))
 
 
     def disp_network(self, figsize=(8,8), show_pm=True):
@@ -60,36 +91,47 @@ class CylEvenNetwork(Network):
         # Plot the surface
         u = np.linspace(0, 2 * np.pi, 50)
         h = np.linspace(0, 1, 20)
-        x = np.outer(self.rho * np.sin(u), np.ones(len(h)))
-        y = np.outer(self.rho * np.cos(u), np.ones(len(h)))
+        x = np.outer(self.rho * np.cos(u), np.ones(len(h)))
+        y = np.outer(self.rho * np.sin(u), np.ones(len(h)))
         z = np.outer(np.ones(len(u)), h)
         ax.plot_surface(x, y, z, color='lightgreen', alpha=.2)
 
+        # Plot cut regions
+        for region in self.regions_cut:
+            u = np.linspace(region[0][0], region[0][1], 50)
+            h = np.linspace(region[1][0], region[1][1], 20)
+            x = np.outer(self.rho * np.cos(u), np.ones(len(h)))
+            y = np.outer(self.rho * np.sin(u), np.ones(len(h)))
+            z = np.outer(np.ones(len(u)), h)
+            ax.plot_surface(x, y, z, color='k', alpha=.2)
+
         # Plot neurons
         for i, loc in enumerate(self.locations):
-            phi = loc[0]
-            z = loc[1]
-            if show_pm and i in self.pacemakers:
-                ax.scatter(self.rho * np.cos(phi),
-                        self.rho * np.sin(phi),
-                        z,
-                        color='#1f77b4', alpha=1, edgecolors=['r'])
-            else:
-                ax.scatter(self.rho * np.cos(phi),
-                        self.rho * np.sin(phi),
-                        z,
-                        color='#1f77b4', alpha=1)
+            if loc is not None:
+                phi = loc[0]
+                z = loc[1]
+                if show_pm and i in self.pacemakers:
+                    ax.scatter(self.rho * np.cos(phi),
+                            self.rho * np.sin(phi),
+                            z,
+                            color='#1f77b4', alpha=1, edgecolors=['r'])
+                else:
+                    ax.scatter(self.rho * np.cos(phi),
+                            self.rho * np.sin(phi),
+                            z,
+                            color='#1f77b4', alpha=1)
 
         # plot edges
         for edge in self.edges:
-            phi1 = self.locations[edge[0]][0]
-            z1 = self.locations[edge[0]][1]
-            phi2 = self.locations[edge[1]][0]
-            z2 = self.locations[edge[1]][1]
-            ax.plot([self.rho * np.cos(phi1), self.rho * np.cos(phi2)],
-                    [self.rho * np.sin(phi1), self.rho * np.sin(phi2)],
-                    [z1, z2],
-                    color='k', lw=.5)
+            if edge is not None:
+                phi1 = self.locations[edge[0]][0]
+                z1 = self.locations[edge[0]][1]
+                phi2 = self.locations[edge[1]][0]
+                z2 = self.locations[edge[1]][1]
+                ax.plot([self.rho * np.cos(phi1), self.rho * np.cos(phi2)],
+                        [self.rho * np.sin(phi1), self.rho * np.sin(phi2)],
+                        [z1, z2],
+                        color='k', lw=.5)
 
         # make the panes transparent
         ax.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))

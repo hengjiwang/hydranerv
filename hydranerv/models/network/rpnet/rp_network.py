@@ -30,9 +30,10 @@ class RPNetwork(Network):
 
     def step(self, sigma_m_li):
         """step function"""
-        voltages = [x.v() for x in self.neurons]
+        voltages = [x.v() if x is not None else None for x in self.neurons]
         for i, neuron in enumerate(self.neurons):
-            neuron.step(sigma_m_li[i], self.i_c(i, voltages))
+            if neuron is not None:
+                neuron.step(sigma_m_li[i], self.i_c(i, voltages))
         self.t += self.dt
 
     def run(self, sigma_m_li):

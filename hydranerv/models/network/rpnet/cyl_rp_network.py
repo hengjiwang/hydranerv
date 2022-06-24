@@ -18,6 +18,7 @@ class CylRPNetwork(RPNetwork):
 
     def set_locations(self):
         """set locations for rp neurons"""
+        self.locations = []
         for _ in self.neurons:
             phi = np.random.uniform(0, 2 * np.pi)
             z = np.random.uniform(0, 1)

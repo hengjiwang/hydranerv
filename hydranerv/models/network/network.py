@@ -52,7 +52,8 @@ class Network:
         # Construct neurons
         self.t = 0
         for neuron in self.neurons:
-            neuron.reset()
+            if neuron is not None:
+                neuron.reset()
 
     def set_connections(self, add_edges=[]):
         """set connections for neurons"""
@@ -89,17 +90,18 @@ class Network:
 
     def step(self, stim_nrns=set(), stim_type='mechanical'):
         """step function"""
-        voltages = [x.v() for x in self.neurons]
+        voltages = [x.v() if x is not None else None for x in self.neurons]
         for i, neuron in enumerate(self.neurons):
-            if i in stim_nrns:
-                if stim_type == 'mechanical':
-                    neuron.step(self.i_c(i, voltages), mech_stim=self.a_stim)
-                elif stim_type == 'electrical':
-                    neuron.step(self.i_c(i, voltages) + self.i_stim)
-                # neuron.step(self.i_c(i, voltages), mech_stim=self.a_stim)
-                # print('neuron #' + str(i) + ' is stimulated at ' + str(round(self.t + self.dt, 5)) + 's')
-            else:
-                neuron.step(self.i_c(i, voltages))
+            if neuron is not None:
+                if i in stim_nrns:
+                    if stim_type == 'mechanical':
+                        neuron.step(self.i_c(i, voltages), mech_stim=self.a_stim)
+                    elif stim_type == 'electrical':
+                        neuron.step(self.i_c(i, voltages) + self.i_stim)
+                    # neuron.step(self.i_c(i, voltages), mech_stim=self.a_stim)
+                    # print('neuron #' + str(i) + ' is stimulated at ' + str(round(self.t + self.dt, 5)) + 's')
+                else:
+                    neuron.step(self.i_c(i, voltages))
         self.t += self.dt
 
     def run(self, stim={}, stim_type='mechanical'):
@@ -123,14 +125,16 @@ class Network:
             fig, ax1 = plt.subplots(1, 1, figsize=figsize)
             for i in ineurons:
                 neuron = self.neurons[i]
-                ax1.vlines(neuron.spikes, i + .1, i + .9, lw=1, color='k')
+                if neuron is not None:
+                    ax1.vlines(neuron.spikes, i + .1, i + .9, lw=1, color='k')
 
         elif style == 'trace':
             time_axis = np.arange(0, self.tmax, self.dt)
             fig, ax1 = plt.subplots(1, 1, figsize=figsize)
             for i in ineurons:
                 neuron = self.neurons[i]
-                ax1.plot(time_axis[skip::skip], [(x + 75) / 110 + i for x in neuron.v_train[skip::skip]], lw=.75)
+                if neuron is not None:
+                    ax1.plot(time_axis[skip::skip], [(x + 75) / 110 + i for x in neuron.v_train[skip::skip]], lw=.75)
                 # ax1.plot(time_axis[skip::skip], np.array(neuron.v_train[skip::skip]) )
         # ax1.plot(time_axis, utils.min_max_norm(self.pcontroller.p_train[1:], .9, self.num), 'k--')
         ax1.set_ylim(0, self.num + 1)
