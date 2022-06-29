@@ -56,7 +56,7 @@ class CylEctoEvenNetwork:
                                       t_syn=.01,
                                       prob_lon=1,
                                       prob_cir=.2,
-                                      phi_offset=np.pi/36,
+                                      phi_offset=np.pi/10,
                                       rho=.5,
                                       seed=seed)
         self.tau_inh_cb = tau_inh_cb
@@ -102,8 +102,8 @@ class CylEctoEvenNetwork:
 
         elif self.method == 'gradient':
             # Config 2 -- gradient mutual inhibition (distance decay)
-            lambda_d_0 = .2
-            lambda_d_1 = .2
+            lambda_d_0 = .3
+            lambda_d_1 = .3
             # add cb -> rp
             for i in range(self.cbnet.num):
                 rho_cb = self.cbnet.rho
@@ -184,6 +184,8 @@ class CylEctoEvenNetwork:
                     self.i_inh['cb_to_rp'][(i, j)].append(i_inh)
                     i_inh_total += i_inh
                 sigma_m = cb.sigma_m() # TODO: replace this cb to the closest cb to rp
+                # TODO: temporarily use a constant sigma_m here, to use constant current in rp
+                # sigma_m = 50000
                 rp.step(sigma_m, self.rpnet.i_c(i, voltages['rp']) - i_inh_total)
 
         self.t += self.dt

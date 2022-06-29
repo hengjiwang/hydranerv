@@ -105,5 +105,5 @@ class RPNeuron:
 
 if __name__ == '__main__':
     nrn = RPNeuron(tmax=200)
-    nrn.run(sigma_m=35000)
+    nrn.run(sigma_m=50000)
     nrn.disp()
