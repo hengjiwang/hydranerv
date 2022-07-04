@@ -52,7 +52,7 @@ def std_euclid_dist(pt1, pt2, std=(1, 1)):
     """Calculates the standardized Euclidean distance between pt1 and pt2"""
     return np.sqrt(((pt1[0] - pt2[0]) / std[0])**2 + ((pt1[1] - pt2[1]) / std[1])**2)
 
-def cyl_dist(pt1, pt2):
+def cyl_dist(pt1, pt2, z_scale=1):
     """Calculates the distance between pt1 and pt2 on a cylindrical surface"""
     r1, phi1, z1 = pt1
     r2, phi2, z2 = pt2
@@ -63,7 +63,7 @@ def cyl_dist(pt1, pt2):
     phi_diff = abs(phi2 - phi1)
     phi_diff = phi_diff if phi_diff < np.pi else 2 * np.pi - phi_diff
 
-    return np.sqrt((r1 * phi_diff) ** 2 + (z2 - z1) ** 2)
+    return np.sqrt((r1 * phi_diff) ** 2 + ((z2 - z1) * z_scale) ** 2)
 
 
 def min_max_norm(l, rescale=1, offset=0):
@@ -173,3 +173,13 @@ def get_clusters(nmovie, fpath='./cb_locs/wataru_data/ctr/', display=True, offse
         plt.ylim(0, inc)
         plt.show()
     return clusters_all, clusters_per_video
+
+def angle_in_range(lower, upper, angle):
+    """judge if an angle is between lower and upper"""
+
+    lower %= 2 * np.pi
+    upper %= 2 * np.pi
+    angle %= 2 * np.pi
+    if lower > upper:
+        return angle > lower or angle < upper
+    return angle >= lower and angle <= upper
