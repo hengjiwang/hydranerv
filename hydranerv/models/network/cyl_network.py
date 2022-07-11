@@ -7,7 +7,7 @@ from hydranerv.utils import utils
 
 class CylNetwork(Network):
     """a model of cylindrical neuronal networks"""
-    def __init__(self, num=150, num_hyp=40, num_ped=40, gc=1, dt=.01, tmax=1000, pacemakers=[],
+    def __init__(self, num=150, num_hyp=40, num_ped=40, gc=1, dt=.01, tmax=1000, pacemakers=None,
                  t_ref=.1, conn_type='gap_junction', t_syn=.01, wnoise=0, is_semi_pm=False,
                  lambda_d=.15, rho=.5, seed=0):
         """constructor"""
@@ -127,7 +127,7 @@ class CylNetwork(Network):
                                 self.neighbors[i].remove(j)
                                 self.neighbors[j].remove(i)
 
-    def disp_network(self, figsize=(8,8), show_pm=True, plot_nid=False, savepath=None):
+    def disp_network(self, figsize=(8,8), show_pm=True, plot_nid=False, savepath=None, upper_bound=1):
         """display the network connectivity"""
         fig = plt.figure(figsize=figsize)
         ax = fig.add_subplot(111, projection='3d')
@@ -135,7 +135,7 @@ class CylNetwork(Network):
 
         # Plot the surface
         u = np.linspace(0, 2 * np.pi, 50)
-        h = np.linspace(0, 1, 20)
+        h = np.linspace(0, upper_bound, 20)
         x = np.outer(self.rho * np.cos(u), np.ones(len(h)))
         y = np.outer(self.rho * np.sin(u), np.ones(len(h)))
         z = np.outer(np.ones(len(u)), h)
@@ -154,21 +154,22 @@ class CylNetwork(Network):
             if loc is not None:
                 phi = loc[0]
                 z = loc[1]
-                if show_pm and i in self.pacemakers:
-                    ax.scatter(self.rho * np.cos(phi),
-                            self.rho * np.sin(phi),
-                            z,
-                            color='C0', alpha=1, edgecolors=['r'])
-                else:
-                    ax.scatter(self.rho * np.cos(phi),
-                            self.rho * np.sin(phi),
-                            z,
-                            color='C0', alpha=1)
-                if plot_nid:
-                    ax.text(self.rho * np.cos(phi),
-                            self.rho * np.sin(phi),
-                            z,
-                            str(i))
+                if z <= upper_bound:
+                    if show_pm and i in self.pacemakers:
+                        ax.scatter(self.rho * np.cos(phi),
+                                self.rho * np.sin(phi),
+                                z,
+                                color='C0', alpha=1, edgecolors=['r'])
+                    else:
+                        ax.scatter(self.rho * np.cos(phi),
+                                self.rho * np.sin(phi),
+                                z,
+                                color='C0', alpha=1)
+                    if plot_nid:
+                        ax.text(self.rho * np.cos(phi),
+                                self.rho * np.sin(phi),
+                                z,
+                                str(i))
 
         # plot edges
         for edge in self.edges:
@@ -177,10 +178,11 @@ class CylNetwork(Network):
                 z1 = self.locations[edge[0]][1]
                 phi2 = self.locations[edge[1]][0]
                 z2 = self.locations[edge[1]][1]
-                ax.plot([self.rho * np.cos(phi1), self.rho * np.cos(phi2)],
-                        [self.rho * np.sin(phi1), self.rho * np.sin(phi2)],
-                        [z1, z2],
-                        color='k', lw=.5)
+                if z1 <= upper_bound and z2 <= upper_bound:
+                    ax.plot([self.rho * np.cos(phi1), self.rho * np.cos(phi2)],
+                            [self.rho * np.sin(phi1), self.rho * np.sin(phi2)],
+                            [z1, z2],
+                            color='k', lw=.5)
 
         # make the panes transparent
         ax.xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
@@ -195,6 +197,7 @@ class CylNetwork(Network):
         ax.set_xlabel('x')
         ax.set_ylabel('y')
         ax.set_zlabel('z')
+        ax.set_zlim(0, 1)
 
         if savepath:
             plt.savefig(savepath, dpi=300, bbox_inches='tight')

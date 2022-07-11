@@ -14,16 +14,16 @@ class RPNeuron:
         self.c_m = 50 # nF
         self.v_th = -55 # mV
         self.v_r = -75 # mV
-        self.g_l = .5 # 1 # nS
+        self.g_l = 1 # 1 # nS
         self.e_l = self.v_r
         self.v_spike = 20 # mV
         self.t_pk = .0 # mV
         self.t_ref = t_ref # s
 
         # PIEZO channel parameters
-        self.g_s = 1.5 # 5 # nS
+        self.g_s = 2 # 5 # nS
         self.e_s = 10 # mV
-        self.s = .004 # .00277 # 1/Pa
+        self.s = .00277 # 1/Pa
         self.k_b = 106
         self.m = 25
         self.q = 1
@@ -105,5 +105,5 @@ class RPNeuron:
 
 if __name__ == '__main__':
     nrn = RPNeuron(tmax=200)
-    nrn.run(sigma_m=50000)
+    nrn.run(sigma_m=100000)
     nrn.disp()

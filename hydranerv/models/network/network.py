@@ -7,7 +7,7 @@ from hydranerv.models.network.neuron import Neuron
 
 class Network:
     """a model for neuronal networks"""
-    def __init__(self, num=10, edges=[], gc=1, dt=.01, tmax=1000, pacemakers=[0], t_ref=.1,
+    def __init__(self, num=10, edges=None, gc=1, dt=.01, tmax=1000, pacemakers=None, t_ref=.1,
                  conn_type='gap_junction', t_syn=.01, wnoise=0, is_semi_pm=False, seed=0):
         """constructor"""
         self.num = num
@@ -66,7 +66,7 @@ class Network:
             self.neighbors[edge[1]].append(edge[0])
 
     def add_edge(self, edge):
-        if edge not in self.edges:
+        if edge not in self.edges and edge[0] != edge[1]:
             self.edges.append(edge)
             self.neighbors[edge[0]].append(edge[1])
             self.neighbors[edge[1]].append(edge[0])
@@ -116,17 +116,20 @@ class Network:
                     break
             self.step(stim_nrns, stim_type)
 
-    def disp(self, figsize=(10, 6), xlim=None, style='spike', ineurons=None, skip=1, savefig=None, dpi=300):
+    def disp(self, figsize=(10, 6), xlim=None, style='spike', ineurons=None, skip=1, savefig=None, dpi=300, title=None, indices=None):
         """display simulation results"""
 
-        ineurons = range(self.num) if ineurons is None else ineurons
+        if not indices:
+            ineurons = range(self.num) if ineurons is None else ineurons
+        else:
+            ineurons = indices
 
         if style == 'spike':
             fig, ax1 = plt.subplots(1, 1, figsize=figsize)
-            for i in ineurons:
+            for ii, i in enumerate(ineurons):
                 neuron = self.neurons[i]
                 if neuron is not None:
-                    ax1.vlines(neuron.spikes, i + .1, i + .9, lw=1, color='k')
+                    ax1.vlines(neuron.spikes, ii + .1, ii + .9, lw=1, color='k')
 
         elif style == 'trace':
             time_axis = np.arange(0, self.tmax, self.dt)
@@ -137,7 +140,12 @@ class Network:
                     ax1.plot(time_axis[skip::skip], [(x + 75) / 110 + i for x in neuron.v_train[skip::skip]], lw=.75)
                 # ax1.plot(time_axis[skip::skip], np.array(neuron.v_train[skip::skip]) )
         # ax1.plot(time_axis, utils.min_max_norm(self.pcontroller.p_train[1:], .9, self.num), 'k--')
-        ax1.set_ylim(0, self.num + 1)
+
+        if not indices:
+            ax1.set_ylim(0, self.num + 1)
+        else:
+            ax1.set_ylim(0, len(indices) + 1)
+
         if xlim:
             ax1.set_xlim(xlim[0], xlim[1])
         else:
@@ -146,6 +154,8 @@ class Network:
         plt.yticks(fontsize=20)
         plt.xlabel('time (s)', fontsize=20)
         plt.ylabel('neuron #', fontsize=20)
+        if title:
+            plt.title(title)
         if savefig:
             plt.savefig(savefig, dpi=dpi, bbox_inches='tight')
         plt.show()
@@ -166,4 +176,3 @@ if __name__ == '__main__':
     ntwk.set_connections(add_edges=[(0, 1)])
     ntwk.run()
     ntwk.disp(style='trace')
-

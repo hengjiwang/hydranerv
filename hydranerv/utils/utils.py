@@ -177,6 +177,9 @@ def get_clusters(nmovie, fpath='./cb_locs/wataru_data/ctr/', display=True, offse
 def angle_in_range(lower, upper, angle):
     """judge if an angle is between lower and upper"""
 
+    if upper - lower == 2 * np.pi:
+        return True
+
     lower %= 2 * np.pi
     upper %= 2 * np.pi
     angle %= 2 * np.pi
