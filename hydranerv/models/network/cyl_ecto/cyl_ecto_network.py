@@ -25,7 +25,7 @@ class CylEctoNetwork:
                  a_inh_cb=50,
                  a_inh_rp=100,
                  lambda_d=(.1, .05),
-                 wnoise=10000,
+                 wnoise=0,
                  seed_cb=123,
                  seed_rp=5):
         """constructor"""
