@@ -85,10 +85,10 @@ class CylEctoNetwork:
                                           (rho_rp, phi_rp, z_rp))
 
                     randnum = np.random.rand()
-                    if randnum < np.exp(- dist ** 2 / 2 / (self.lambda_d[0]) ** 2) * np.exp( - 2 * z_rp):
+                    if randnum < np.exp(- dist ** 2 / 2 / (self.lambda_d[0]) ** 2): # * .4: # np.exp( - 2 * z_rp):
                         self.edges['rp_to_cb'].append((i, j))
                     randnum = np.random.rand()
-                    if randnum < np.exp(- dist ** 2 / 2 / (self.lambda_d[1]) ** 2) * np.exp(2 * (z_cb - 1)):
+                    if randnum < np.exp(- dist ** 2 / 2 / (self.lambda_d[1]) ** 2): # * .4: # * np.exp(2 * (z_cb - 1)):
                         self.edges['cb_to_rp'].append((j, i))
 
         elif method == 'nearest_neighbor':
